@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+// The pick `umka:pick`, for the repeat stage of a stage list: prints the next ticket of
+// the spec issue of the run, or nothing. The host runs it in the container of a thread
+// with the checkout as its working directory and the link of the spec issue as its one
+// argument. The link is a GitHub issue of the repository when it is the address of the
+// repository, as `gh repo view` prints it, followed by `/issues/<n>`; any other link is
+// no case of this script, so it declines with the exit code 3, nothing printed and one
+// line on the standard error that says the agent picks. For a GitHub issue, a ticket is
+// an open issue with the label `umka` whose `## Parent` heading names the spec issue,
+// and the next one is the oldest whose `## Blocked by` issues are all closed. It prints
+// the number and the title of that ticket, then its link, then the count of the open
+// tickets, each on a line of its own. With no argument, or one that is no `https://`
+// link, it fails with the exit code 1 and one line on the standard error.
+// Node reads this file as a module of either kind, by the folder it is in, so it takes
+// its modules from the process, and `tickets.cjs` beside it through them.
+const { realpathSync } = process.getBuiltinModule("node:fs");
+const { createRequire } = process.getBuiltinModule("node:module");
+const {
+  DECLINED,
+  LINK,
+  oneLine,
+  labelled,
+  ticketOf,
+  gh,
+  repositoryIssue,
+  issuesUnder,
+} = createRequire(realpathSync(process.argv[1]))("./tickets.cjs");
+
+// The number of the spec issue, from the link the host gave: the one argument.
+function specIssueNumber() {
+  const [link] = process.argv.slice(2);
+  if (link === undefined) throw new Error("no spec issue was given");
+  if (!LINK.test(link))
+    throw new Error(`the spec issue ${link} is no \`https://\` link`);
+  const number = repositoryIssue(link);
+  if (number) return number;
+  const error = new Error(
+    `the spec issue ${link} is no GitHub issue of the repository, so the agent picks`,
+  );
+  error.code = DECLINED;
+  throw error;
+}
+
+function pick() {
+  const spec = specIssueNumber();
+  const open = labelled("open", "number,title,body,url,createdAt");
+  const tickets = open
+    .filter(ticketOf(spec))
+    .sort(
+      (a, b) => a.createdAt.localeCompare(b.createdAt) || a.number - b.number,
+    );
+  // Whether an issue is closed, by its number: an issue of the list is open, and `gh` is
+  // asked about any other once.
+  const closedByNumber = new Map(open.map(({ number }) => [number, false]));
+  const isClosed = (number) => {
+    if (!closedByNumber.has(number))
+      closedByNumber.set(
+        number,
+        gh("issue", "view", String(number), "--json", "state").state !== "OPEN",
+      );
+    return closedByNumber.get(number);
+  };
+  const ready = tickets.find((ticket) =>
+    issuesUnder(ticket, "Blocked by").every(isClosed),
+  );
+  if (!ready) return "";
+  return `${ready.number} ${oneLine(ready.title)}\n${ready.url}\n${tickets.length}\n`;
+}
+
+try {
+  process.stdout.write(pick());
+} catch (error) {
+  console.error(`pick: ${error.message}`);
+  process.exitCode = error.code === DECLINED ? DECLINED : 1;
+}

@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+// The registry of `umka:run`: the frontmatter of `phases/*.md`, read through `phases.mjs`.
+// `registry lint [--dir <phases>]` checks it and exits 1 with one line per error.
+// `registry graph [--dir <phases>]` prints it as a Mermaid flowchart.
+// Node reads this file as a module of either kind, by the folder it is in, so it takes its
+// modules from the process and its own module by dynamic import.
+const fs = process.getBuiltinModule("node:fs");
+const path = process.getBuiltinModule("node:path");
+const here = path.dirname(fs.realpathSync(process.argv[1]));
+const { MODES, KEYS, load } = await import(path.join(here, "phases.mjs"));
+
+function lint(dir) {
+  const { phases, errors } = load(dir);
+  if (Object.keys(phases).length === 0) errors.push(`${dir}: no phase files`);
+  const has = (p, k) => p[k] !== undefined && p[k] !== "" && !(Array.isArray(p[k]) && k !== "to" && p[k].length === 0);
+  for (const [slug, p] of Object.entries(phases)) {
+    const err = (msg) => errors.push(`${p.file}: ${msg}`);
+    if (p.phase !== slug) err(`phase: "${p.phase}" differs from the file name "${slug}"`);
+    if (!MODES.includes(p.mode)) err(`mode: "${p.mode}" is not one of ${MODES.join(", ")}`);
+    for (const k of ["skill", "artifact"]) if (!has(p, k)) err(`${k}: missing`);
+    if (!Array.isArray(p.from) || p.from.length === 0) err("from: missing");
+    if (!Array.isArray(p.to)) err("to: missing");
+    if (p.mode === "afk" && !has(p, "budget")) err("budget: missing on an afk phase");
+    if (p.mode === "checkpoint" && !has(p, "ask")) err("ask: missing on a checkpoint");
+    if (p.mode !== "checkpoint" && has(p, "auto-close when")) err("auto-close when: only a checkpoint has one");
+    for (const k of Object.keys(p)) if (!["file", "body"].includes(k) && !KEYS.includes(k)) err(`${k}: unknown key`);
+    for (const t of Array.isArray(p.to) ? p.to : []) {
+      const target = typeof t === "string" ? t : t.phase;
+      if (!target) { err("to: an entry has no phase"); continue; }
+      if (!phases[target]) { err(`to: target "${target}" has no phase file`); continue; }
+      const back = Array.isArray(phases[target].from) ? phases[target].from : [];
+      if (!back.includes(slug)) err(`to: target "${target}" does not list ${slug} in its from:`);
+    }
+    for (const f of Array.isArray(p.from) ? p.from : []) {
+      if (f === "source") continue;
+      if (!phases[f]) { err(`from: "${f}" has no phase file`); continue; }
+      const fwd = (Array.isArray(phases[f].to) ? phases[f].to : []).map((t) => (typeof t === "string" ? t : t.phase));
+      if (!fwd.includes(slug)) err(`from: "${f}" does not list ${slug} in its to:`);
+    }
+  }
+  return errors;
+}
+
+function graph(dir) {
+  const { phases } = load(dir);
+  const id = (s) => s.replace(/-/g, "_");
+  const lines = ["flowchart TD", "  source([source])"];
+  for (const [slug, p] of Object.entries(phases)) {
+    const label = p.mode === "checkpoint" ? `{{"${slug}"}}` : p.mode === "hitl" ? `[["${slug} (hitl)"]]` : `["${slug} ${p.budget || ""}"]`;
+    lines.push(`  ${id(slug)}${label}`);
+  }
+  for (const [slug, p] of Object.entries(phases)) {
+    if ((p.from || []).includes("source")) lines.push(`  source --> ${id(slug)}`);
+    for (const t of p.to || []) {
+      const target = typeof t === "string" ? t : t.phase;
+      const when = typeof t === "string" ? "" : [t.when, t.per && `per ${t.per}`].filter(Boolean).join(", ");
+      lines.push(`  ${id(slug)} -->${when ? `|"${when}"|` : ""} ${id(target)}`);
+    }
+  }
+  return lines.join("\n");
+}
+
+const args = process.argv.slice(2);
+const cmd = args[0];
+const dirFlag = args.indexOf("--dir");
+const dir = dirFlag >= 0 ? args[dirFlag + 1] : path.join(here, "phases");
+if (cmd === "lint") {
+  const errors = lint(dir);
+  for (const e of errors) console.error(e);
+  process.exit(errors.length ? 1 : 0);
+} else if (cmd === "graph") {
+  console.log(graph(dir));
+} else {
+  console.error("usage: registry lint|graph [--dir <phases>]");
+  process.exit(2);
+}

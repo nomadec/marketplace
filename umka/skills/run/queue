@@ -1,0 +1,179 @@
+#!/usr/bin/env node
+// The three entry points of `umka:run` that need no agent until there is work, run as `umka <command>`:
+//   umka init              make the home: the beads database, the sources, cursors and repos files
+//   umka tick [--dry-run]  pick one item (pick.mjs) and start one turn on it with the human absent
+//   umka inbox             walk the briefed items that wait on a human, oldest first, and record each word
+//   umka intake [--dry-run] poll each source after its cursor, lay an epic per new item, start one turn to class them
+// The home is $UMKA_HOME, else ~/.umka. Every `bd` call goes through `bd -C <home>`.
+const fs = process.getBuiltinModule("node:fs");
+const os = process.getBuiltinModule("node:os");
+const path = process.getBuiltinModule("node:path");
+const readline = process.getBuiltinModule("node:readline/promises");
+const { spawnSync, execFileSync } = process.getBuiltinModule("node:child_process");
+const here = path.dirname(fs.realpathSync(process.argv[1]));
+const { load } = await import(path.join(here, "phases.mjs"));
+const { decide, modeOf, HUMAN } = await import(path.join(here, "pick.mjs"));
+
+const home = process.env.UMKA_HOME || path.join(os.homedir(), ".umka");
+const plugin = path.resolve(here, "..", "..");
+const args = process.argv.slice(2);
+const cmd = args[0];
+const dry = args.includes("--dry-run");
+
+const file = (name) => path.join(home, name);
+const readJson = (name, fallback) => (fs.existsSync(file(name)) ? JSON.parse(fs.readFileSync(file(name), "utf8")) : fallback);
+const writeJson = (name, data) => fs.writeFileSync(file(name), JSON.stringify(data, null, 2) + "\n");
+
+function bd(...a) {
+  return execFileSync("bd", ["-C", home, ...a], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+}
+const bdJson = (...a) => JSON.parse(bd(...a, "--json") || "[]");
+const dump = () => bdJson("list", "--all", "-n", "0");
+
+function registry() {
+  const { phases, errors } = load(path.join(here, "phases"));
+  if (errors.length) { for (const e of errors) console.error(e); process.exit(1); }
+  return phases;
+}
+
+function health() {
+  if (!fs.existsSync(path.join(home, ".beads"))) {
+    console.error(`${home} has no beads database: run \`umka init\``);
+    process.exit(1);
+  }
+}
+
+// One turn, in the terminal, so the human watches it: the skill command as the first message.
+// The flags come from $UMKA_CLAUDE_FLAGS when set; the repos file gives the checkouts as --add-dir.
+function turn(command) {
+  console.log(`turn: ${command}`);
+  if (dry) return;
+  // The slash form is unknown to an interactive session at its first prompt: the plugin
+  // loads after it. Asking for the Skill tool reaches the skill once it has loaded.
+  const args = command.replace(/^\/umka:run\s*/, "");
+  const prompt = `Invoke the Skill tool with skill "umka:run" and args "${args}", then follow what it says.`;
+  const flags = (process.env.UMKA_CLAUDE_FLAGS ?? "--dangerously-skip-permissions").split(" ").filter(Boolean);
+  const repos = readJson("repos.json", {});
+  const dirs = Object.values(repos).flatMap((p) => ["--add-dir", p]);
+  const r = spawnSync("claude", [prompt, "--plugin-dir", plugin, ...flags, ...dirs], {
+    stdio: "inherit",
+    cwd: home,
+    env: { ...process.env, UMKA_HOME: home },
+  });
+  if (r.error) {
+    console.error(`claude did not start: ${r.error.message}`);
+    process.exit(1);
+  }
+  if (r.status !== 0) process.exit(r.status ?? 1);
+}
+
+function init() {
+  fs.mkdirSync(home, { recursive: true });
+  if (!fs.existsSync(path.join(home, ".git"))) execFileSync("git", ["init", "-q"], { cwd: home });
+  execFileSync("git", ["config", "beads.role", "maintainer"], { cwd: home });
+  if (!fs.existsSync(path.join(home, ".beads"))) {
+    execFileSync("bd", ["init", "-p", "u", "--non-interactive", "--skip-agents"], { cwd: home, env: { ...process.env, BD_NON_INTERACTIVE: "1" }, stdio: "ignore" });
+  }
+  if (!fs.existsSync(file("sources.json"))) writeJson("sources.json", { sources: [] });
+  if (!fs.existsSync(file("cursors.json"))) writeJson("cursors.json", {});
+  if (!fs.existsSync(file("repos.json"))) writeJson("repos.json", {});
+  console.log(`home: ${home}`);
+}
+
+function tick() {
+  health();
+  const d = decide(dump(), registry());
+  for (const i of d.inProgress) console.log(`in progress, left alone: ${i.id} ${i.title}`);
+  if (!d.pick) {
+    for (const w of d.waiting) console.log(`waiting on you: ${w.id} ${w.title}`);
+    console.log(d.waiting.length ? "Nothing ready for the tick; run `umka inbox`" : "Nothing ready for the tick");
+    return;
+  }
+  console.log(`pick: ${d.pick.id} ${d.pick.title} (${d.pick.reason})`);
+  turn(`/umka:run ${d.pick.id} afk`);
+}
+
+async function inbox() {
+  health();
+  const phases = registry();
+  const issues = dump();
+  const d = decide(issues, phases);
+  if (!d.waiting.length) { console.log("Nothing waits on you"); return; }
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    for (const w of d.waiting) {
+      const issue = issues.find((i) => i.id === w.id);
+      const phase = phases[w.phase];
+      const session = phase.mode === "hitl" && !/\*\*Apply\*\*/.test(phase.body);
+      console.log(`\n${issue.description || `${w.id}: ${w.title}`}\n`);
+      if (session) {
+        const a = (await rl.question("This item needs you in a session. Start it now? [y/N/quit] ")).trim();
+        if (a === "quit") break;
+        if (/^y/i.test(a)) { rl.pause(); turn(`/umka:run ${w.id}`); rl.resume(); }
+        continue;
+      }
+      const a = (await rl.question("Your word (empty: skip, quit: stop): ")).trim();
+      if (a === "quit") break;
+      if (!a) continue;
+      bd("close", w.id, "--reason", a);
+      console.log(`closed ${w.id}; the next tick applies it`);
+    }
+  } finally {
+    rl.close();
+  }
+}
+
+// The poll: GitHub Issues and JSON Lines files today. Each source has one cursor, the newest
+// item taken, by its creation time. Jira waits for a client.
+function poll(source, cursor) {
+  if (source.kind === "github") {
+    const since = cursor?.created ? ` created:>${cursor.created}` : "";
+    const out = execFileSync("gh", ["issue", "list", "--repo", source.repo, "--state", "all", "--limit", "200",
+      "--search", `sort:created-asc${since}`, "--json", "number,title,body,author,labels,url,createdAt"], { encoding: "utf8" });
+    return JSON.parse(out)
+      .filter((i) => String(i.number) !== String(cursor?.id))
+      .map((i) => ({ id: String(i.number), title: i.title, text: i.body || "", who: i.author?.login || "unknown",
+        created: i.createdAt, labels: (i.labels || []).map((l) => l.name), link: i.url }));
+  }
+  if (source.kind === "file") {
+    const lines = fs.readFileSync(source.path, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+    const at = cursor?.id ? lines.findIndex((l) => String(l.id) === String(cursor.id)) : -1;
+    return lines.slice(at + 1).map((l) => ({ ...l, id: String(l.id), link: `${source.path}#${l.id}` }));
+  }
+  console.error(`source ${source.name}: kind "${source.kind}" has no poll yet`);
+  return [];
+}
+
+function intake() {
+  health();
+  const { sources } = readJson("sources.json", { sources: [] });
+  const cursors = readJson("cursors.json", {});
+  const known = new Set(dump().map((i) => i.external_ref).filter(Boolean));
+  const laid = [];
+  for (const s of sources) {
+    const items = poll(s, cursors[s.name]);
+    for (const it of items) {
+      if (known.has(it.link)) { console.log(`duplicate: ${it.link}`); continue; }
+      console.log(`new: ${it.link} ${it.title}`);
+      if (!dry) {
+        const e = bdJson("create", it.title, "--type", "epic", "-l", "loop", "--external-ref", it.link,
+          "-d", `${it.text}\n\nSent by ${it.who} (${s.name}).`);
+        bd("note", e.id, "channel: cli");
+        if (s.repo_key) bd("note", e.id, `repo: ${s.repo_key}`);
+        laid.push(e.id);
+      }
+    }
+    const last = items[items.length - 1];
+    if (last && !dry) cursors[s.name] = { id: last.id, created: last.created };
+  }
+  if (!dry) writeJson("cursors.json", cursors);
+  if (!laid.length) { console.log(dry ? "dry run: nothing laid" : "Nothing new"); return; }
+  turn(`/umka:run intake ${laid.join(" ")} afk`);
+}
+
+const commands = { init, tick, inbox, intake };
+if (!commands[cmd]) {
+  console.error("usage: umka init|tick|inbox|intake [--dry-run]");
+  process.exit(2);
+}
+await commands[cmd]();

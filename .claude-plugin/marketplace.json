@@ -1,0 +1,14 @@
+{
+  "name": "marketplace",
+  "description": "Plugins for agentic delivery: the umka loop, which runs a unit of work phase by phase on a beads map in fresh sessions.",
+  "owner": {
+    "name": "nomadec"
+  },
+  "plugins": [
+    {
+      "name": "umka",
+      "source": "./umka",
+      "description": "The delivery loop: one turn works one phase of one unit, closes out, lays the next phases. Skills run and findings, a Stop hook, the queue script for a timer."
+    }
+  ]
+}

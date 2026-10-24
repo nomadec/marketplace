@@ -1,0 +1,201 @@
+#!/usr/bin/env node
+// The script `umka:publish`, for the script stage that ends a workflow: pushes the
+// branch of the checkout and opens a pull request against the default branch, ready for
+// review. The host runs it in the container of a thread with the checkout as its
+// working directory and one pair of arguments per spec issue of the checkout, the link
+// then the title, in the order the host recorded them, and says its one line from what
+// it printed or from the reason it wrote after `publish:`. The body of the pull request
+// holds one section per spec issue, in that order: the title linked to the link, and,
+// when the link is a GitHub issue of the repository, by the shape rule the pick uses,
+// one line per closed ticket of that spec issue and a `Closes` line for it. For a link
+// of another tracker nothing is read from the tracker. The ADRs that the branch adds
+// come in the section of the last spec issue, before its `Closes` line. The spec issue
+// holds the proposal. The title of the pull request is the title of the last spec
+// issue. An open pull request of the branch gets the commits and the body,
+// so a branch built again keeps its one pull request, and is marked ready when it is a
+// draft. It prints the link of the pull request and nothing else, never merges and never
+// marks a pull request a draft. With no pair, a link with no title or a link that is no
+// `https://` link it fails with the exit code 1 and one line on the standard error.
+// Node reads this file as a module of either kind, by the folder it is in, so it takes
+// its modules from the process, and `tickets.cjs` beside it through them.
+const { readFileSync, realpathSync } = process.getBuiltinModule("node:fs");
+const path = process.getBuiltinModule("node:path");
+const { createRequire } = process.getBuiltinModule("node:module");
+const { LINK, oneLine, labelled, ticketOf, run, gh, branch, repositoryIssue } =
+  createRequire(realpathSync(process.argv[1]))("./tickets.cjs");
+
+// An ADR: a Markdown file of a folder `docs/adr/`, at the root or under a context.
+const ADR = /(^|\/)docs\/adr\/(?!README\.md$)[^/]+\.md$/i;
+// The most changes that the line of a refused working tree names.
+const CHANGES_NAMED = 20;
+// The most characters of a title that GitHub takes.
+const TITLE_LIMIT = 256;
+
+const git = (...args) => run("git", args).trim();
+// The paths that git printed with `-z`: each as it is, whatever its characters.
+const paths = (printed) => printed.split("\0").filter(Boolean);
+// A Markdown link whose text is text that anyone may have written.
+const link = (text, url) =>
+  `[${oneLine(text).replace(/[\\[\]]/g, "\\$&")}](${url})`;
+
+// Refuses a working tree that holds a change that is not committed, with the files named.
+// An entry of the status is two letters, a space and the path, and the entry of a rename
+// or a copy is followed by one that holds the path it came from.
+function refuseChanges() {
+  const changes = [];
+  const entries = paths(run("git", ["status", "--porcelain", "-z"]));
+  for (let index = 0; index < entries.length; index++) {
+    changes.push(entries[index].slice(3));
+    if (/[RC]/.test(entries[index].slice(0, 2))) index++;
+  }
+  if (!changes.length) return;
+  const more = changes.length - CHANGES_NAMED;
+  throw new Error(
+    `the working tree holds changes that are not committed: ${changes
+      .slice(0, CHANGES_NAMED)
+      .join(", ")}${more > 0 ? ` and ${more} more` : ""}`,
+  );
+}
+
+// The title of an ADR: its first heading of the first level below its front matter, or
+// the name of its file.
+function adrTitle(file) {
+  const text = readFileSync(file, "utf8").replace(
+    /^---\r?\n[\s\S]*?\r?\n---\r?\n/,
+    "",
+  );
+  const [, title] = /^#\s+(.+)$/m.exec(text) ?? [];
+  return title ?? path.basename(file);
+}
+
+// The spec issues the host told the script, in its order: one pair of arguments per
+// spec issue, the link then the title. None, a link with no title and a link that is no
+// `https://` link fail.
+function specIssuesTold() {
+  const args = process.argv.slice(2);
+  if (!args.length) throw new Error("the branch has no spec issue");
+  const specs = [];
+  for (let index = 0; index < args.length; index += 2) {
+    const link = args[index];
+    const title = oneLine(args[index + 1] ?? "");
+    if (!LINK.test(link))
+      throw new Error(`the spec issue ${link} is no \`https://\` link`);
+    if (!title) throw new Error(`the spec issue ${link} was given no title`);
+    specs.push({ link, title });
+  }
+  return specs;
+}
+
+// The specs of the branch, one per spec issue the host told the script, in that order:
+// the title and the link of the spec issue, and, for a spec issue that is a GitHub
+// issue of the repository, its number and its closed tickets. A spec issue of another
+// tracker has no tickets here, since nothing is read from its tracker. A ticket that
+// was closed as not planned is not done, so it has no line.
+function specsOf(told, repository) {
+  const specs = told.map((spec) => ({
+    ...spec,
+    number: repositoryIssue(spec.link, repository),
+  }));
+  const closed = specs.some(({ number }) => number)
+    ? labelled("closed", "number,title,body,url,stateReason").filter(
+        ({ stateReason }) => stateReason !== "NOT_PLANNED",
+      )
+    : [];
+  return specs.map((spec) => ({
+    ...spec,
+    tickets: spec.number
+      ? closed.filter(ticketOf(spec.number)).sort((a, b) => a.number - b.number)
+      : [],
+  }));
+}
+
+function publish() {
+  const told = specIssuesTold();
+  refuseChanges();
+  const name = branch();
+  const { defaultBranchRef, url: repository } = gh(
+    "repo",
+    "view",
+    "--json",
+    "defaultBranchRef,url",
+  );
+  const base = defaultBranchRef.name;
+  if (name === base)
+    throw new Error(`the checkout is on the default branch ${base}`);
+  const specs = specsOf(told, repository);
+  const last = specs.at(-1);
+  const baseRef = `refs/remotes/origin/${base}`;
+  git("fetch", "--quiet", "origin", `+refs/heads/${base}:${baseRef}`);
+  if (git("rev-list", "--count", `${baseRef}..HEAD`) === "0")
+    throw new Error(
+      `the branch ${name} holds no commit that the default branch ${base} lacks`,
+    );
+  const head = git("rev-parse", "HEAD");
+  const adrs = paths(
+    git("diff", "-z", "--name-only", "--diff-filter=A", `${baseRef}...HEAD`),
+  ).filter((file) => ADR.test(file));
+  const blob = (file) =>
+    `${repository}/blob/${head}/${file.split("/").map(encodeURIComponent).join("/")}`;
+  const decisions =
+    adrs.length &&
+    `## Decisions\n\n${adrs.map((file) => `- ${link(adrTitle(file), blob(file))}`).join("\n")}`;
+  const sections = specs.flatMap((spec) => [
+    `## Spec\n\n${link(spec.title, spec.link)}`,
+    spec.tickets.length &&
+      `## Tickets\n\n${spec.tickets.map(({ title, url }) => `- ${link(title, url)}`).join("\n")}`,
+    spec === last && decisions,
+    spec.number && `Closes #${spec.number}`,
+  ]);
+  const body = `${sections.filter(Boolean).join("\n\n")}\n`;
+  git("push", "--quiet", "--set-upstream", "origin", name);
+  // The open pull request of the branch against the default branch, which the `Closes`
+  // line works in.
+  const [existing] = gh(
+    "pr",
+    "list",
+    "--head",
+    name,
+    "--base",
+    base,
+    "--state",
+    "open",
+    "--json",
+    "number,url,isDraft",
+  );
+  if (existing) {
+    const number = String(existing.number);
+    run("gh", ["pr", "edit", number, "--body-file", "-"], body);
+    if (existing.isDraft) run("gh", ["pr", "ready", number]);
+    return existing.url;
+  }
+  const created = run(
+    "gh",
+    [
+      "pr",
+      "create",
+      "--base",
+      base,
+      "--head",
+      name,
+      "--title",
+      oneLine(last.title).slice(0, TITLE_LIMIT),
+      "--body-file",
+      "-",
+    ],
+    body,
+  );
+  const url = created
+    .split("\n")
+    .map((line) => line.trim())
+    .findLast((line) => /^https:\/\/\S+$/.test(line));
+  if (!url) throw new Error("`gh pr create` printed no link");
+  return url;
+}
+
+try {
+  const url = publish();
+  process.stdout.write(`${url}\n`);
+} catch (error) {
+  console.error(`publish: ${error.message}`);
+  process.exitCode = 1;
+}

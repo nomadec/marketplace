@@ -1,0 +1,2875 @@
+[
+ {
+  "id": "app-05y",
+  "title": "Unit app-05y: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T05:22:13Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/8",
+  "description": "Brief for app-05y. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-05y.1",
+  "title": "reproduce",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T05:22:15Z",
+  "closed_at": "2026-10-20T06:12:56Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-05y",
+  "dependencies": [
+   {
+    "depends_on_id": "app-05y",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-05y.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-05y.2",
+  "title": "checkpoint: work for app-05y.2",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop",
+   "phase:decide-fix",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T06:12:46Z",
+  "parent": "app-05y",
+  "dependencies": [
+   {
+    "depends_on_id": "app-05y",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-05y.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-05y.2. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-05y.3",
+  "title": "fix",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:fix",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T06:12:55Z",
+  "parent": "app-05y",
+  "dependencies": [
+   {
+    "depends_on_id": "app-05y.2",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-05y",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-05y.3. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-1i9",
+  "title": "Unit app-1i9: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:23:06Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/60",
+  "description": "Brief for app-1i9. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-1nv",
+  "title": "Unit app-1nv: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:workforce-structure"
+  ],
+  "created_at": "2026-10-20T05:23:22Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/148",
+  "description": "Brief for app-1nv. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-1pv",
+  "title": "Unit app-1pv: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:23:04Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/59",
+  "description": "Brief for app-1pv. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-1xs",
+  "title": "Unit app-1xs: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:16Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/10",
+  "description": "Brief for app-1xs. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-3se",
+  "title": "Unit app-3se: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:19Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/11",
+  "description": "Brief for app-3se. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-483",
+  "title": "Unit app-483: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:27Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/14",
+  "description": "Brief for app-483. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-48a",
+  "title": "Unit app-48a: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:23:11Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/62",
+  "description": "Brief for app-48a. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-4g2",
+  "title": "Unit app-4g2: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:historic-import"
+  ],
+  "created_at": "2026-10-20T05:23:13Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/76",
+  "description": "Brief for app-4g2. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-6ix",
+  "title": "Unit app-6ix: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:app-sync"
+  ],
+  "created_at": "2026-10-20T05:23:27Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/200",
+  "description": "Brief for app-6ix. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-79w",
+  "title": "Unit app-79w: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T05:22:09Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/7",
+  "description": "Brief for app-79w. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-79w.1",
+  "title": "reproduce",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T05:22:12Z",
+  "closed_at": "2026-10-20T06:07:22Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-79w",
+  "dependencies": [
+   {
+    "depends_on_id": "app-79w",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-79w.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-79w.2",
+  "title": "checkpoint: work for app-79w.2",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "applied",
+   "checkpoint",
+   "loop",
+   "phase:decide-fix",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T06:07:20Z",
+  "closed_at": "2026-10-20T06:09:42Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-79w",
+  "dependencies": [
+   {
+    "depends_on_id": "app-79w.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-79w",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-79w.2. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-79w.3",
+  "title": "fix",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:fix",
+   "topic:media-generation"
+  ],
+  "created_at": "2026-10-20T06:07:21Z",
+  "parent": "app-79w",
+  "dependencies": [
+   {
+    "depends_on_id": "app-79w.2",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-79w",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-79w.3. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-7a1",
+  "title": "Unit app-7a1: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:frontend"
+  ],
+  "created_at": "2026-10-20T05:23:20Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/90",
+  "description": "Brief for app-7a1. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-7jw",
+  "title": "Unit app-7jw: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:23:09Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/61",
+  "description": "Brief for app-7jw. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-8gj",
+  "title": "Unit app-8gj: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:roster-push"
+  ],
+  "created_at": "2026-10-20T05:22:55Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/53",
+  "description": "Brief for app-8gj. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-8rc",
+  "title": "Unit app-8rc: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:tenancy"
+  ],
+  "created_at": "2026-10-20T05:22:51Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/50",
+  "description": "Brief for app-8rc. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-8rc.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:tenancy"
+  ],
+  "created_at": "2026-10-20T05:22:54Z",
+  "parent": "app-8rc",
+  "dependencies": [
+   {
+    "depends_on_id": "app-8rc",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-8rc.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-995",
+  "title": "Unit app-995: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:frontend"
+  ],
+  "created_at": "2026-10-20T05:22:35Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/34",
+  "description": "Brief for app-995. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-995.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:frontend"
+  ],
+  "created_at": "2026-10-20T05:22:37Z",
+  "parent": "app-995",
+  "dependencies": [
+   {
+    "depends_on_id": "app-995",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-995.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-9v3",
+  "title": "Unit app-9v3: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:training-events"
+  ],
+  "created_at": "2026-10-20T05:22:44Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/39",
+  "description": "Brief for app-9v3. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-9v3.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:training-events"
+  ],
+  "created_at": "2026-10-20T05:22:47Z",
+  "parent": "app-9v3",
+  "dependencies": [
+   {
+    "depends_on_id": "app-9v3",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-9v3.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-b1x",
+  "title": "Unit app-b1x: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:historic-import"
+  ],
+  "created_at": "2026-10-20T05:23:18Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/89",
+  "description": "Brief for app-b1x. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-bvd",
+  "title": "Unit app-bvd: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:scorm"
+  ],
+  "created_at": "2026-10-20T05:22:31Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/33",
+  "description": "Brief for app-bvd. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-bvd.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:scorm"
+  ],
+  "created_at": "2026-10-20T05:22:34Z",
+  "parent": "app-bvd",
+  "dependencies": [
+   {
+    "depends_on_id": "app-bvd",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-bvd.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-c7u",
+  "title": "Unit app-c7u: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:oban"
+  ],
+  "created_at": "2026-10-20T05:22:38Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/35",
+  "description": "Brief for app-c7u. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-cey",
+  "title": "Unit app-cey: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:03Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/5",
+  "description": "Brief for app-cey. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-cfb",
+  "title": "Unit app-cfb: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:app-sync"
+  ],
+  "created_at": "2026-10-20T05:23:25Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/161",
+  "description": "Brief for app-cfb. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-d1o",
+  "title": "Unit app-d1o: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:training-events"
+  ],
+  "created_at": "2026-10-20T05:22:48Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/40",
+  "description": "Brief for app-d1o. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-d1o.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:training-events"
+  ],
+  "created_at": "2026-10-20T05:22:50Z",
+  "parent": "app-d1o",
+  "dependencies": [
+   {
+    "depends_on_id": "app-d1o",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-d1o.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-eam",
+  "title": "Unit app-eam: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:21Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/12",
+  "description": "Brief for app-eam. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-eam.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:23Z",
+  "parent": "app-eam",
+  "dependencies": [
+   {
+    "depends_on_id": "app-eam",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-eam.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-g66",
+  "title": "Unit app-g66: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:23:02Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/58",
+  "description": "Brief for app-g66. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-ir1",
+  "title": "Unit app-ir1: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:scorm"
+  ],
+  "created_at": "2026-10-20T05:22:29Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/32",
+  "description": "Brief for app-ir1. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-j8j",
+  "title": "Unit app-j8j: a change to the app",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop"
+  ],
+  "created_at": "2026-10-14T12:56:06Z",
+  "closed_at": "2026-10-19T18:26:44Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "notes": "channel: cli\nrepo: app",
+  "description": "Brief for app-j8j. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-j8j.1",
+  "title": "grill",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "applied",
+   "loop",
+   "phase:grill"
+  ],
+  "created_at": "2026-10-14T12:56:07Z",
+  "closed_at": "2026-10-14T17:02:50Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.10",
+  "title": "implement: work for app-j8j.10",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:14Z",
+  "closed_at": "2026-10-15T04:29:48Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/183",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.10. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.11",
+  "title": "implement: work for app-j8j.11",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:17Z",
+  "closed_at": "2026-10-15T04:41:16Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/184",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.11. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.12",
+  "title": "implement: work for app-j8j.12",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:19Z",
+  "closed_at": "2026-10-15T04:53:58Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/185",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.12. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.13",
+  "title": "implement: work for app-j8j.13",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:22Z",
+  "closed_at": "2026-10-15T05:06:51Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/186",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.13. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.14",
+  "title": "implement: work for app-j8j.14",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:24Z",
+  "closed_at": "2026-10-15T05:24:00Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/187",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.14. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.15",
+  "title": "implement: work for app-j8j.15",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:27Z",
+  "closed_at": "2026-10-15T05:41:23Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/188",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.7",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.15. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.16",
+  "title": "implement: work for app-j8j.16",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:30Z",
+  "closed_at": "2026-10-15T06:00:01Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/189",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.16. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.17",
+  "title": "implement: work for app-j8j.17",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:32Z",
+  "closed_at": "2026-10-15T06:22:26Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/190",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.17. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.18",
+  "title": "implement: work for app-j8j.18",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:35Z",
+  "closed_at": "2026-10-15T06:41:21Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/191",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.18. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.19",
+  "title": "implement: work for app-j8j.19",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:37Z",
+  "closed_at": "2026-10-15T06:57:14Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/192",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.19. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.2",
+  "title": "checkpoint: work for app-j8j.2",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-14T12:56:09Z",
+  "closed_at": "2026-10-14T17:02:51Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.2. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.20",
+  "title": "implement: work for app-j8j.20",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:40Z",
+  "closed_at": "2026-10-15T07:04:09Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/193",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.7",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.20. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.21",
+  "title": "implement: work for app-j8j.21",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:42Z",
+  "closed_at": "2026-10-15T07:18:52Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/194",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.21. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.22",
+  "title": "implement: work for app-j8j.22",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:45Z",
+  "closed_at": "2026-10-15T09:05:45Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/195",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.21",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.20",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.19",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.11",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.14",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.18",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.12",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.10",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.17",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.13",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.9",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.16",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.22. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.23",
+  "title": "pr",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:pr"
+  ],
+  "created_at": "2026-10-15T03:16:01Z",
+  "closed_at": "2026-10-15T09:08:09Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.11",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.7",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.19",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.15",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.14",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.10",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.13",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.18",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.21",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.17",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.12",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.22",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.9",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.16",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.20",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.23. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.24",
+  "title": "review round 1",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:review"
+  ],
+  "created_at": "2026-10-15T03:16:20Z",
+  "closed_at": "2026-10-15T09:22:03Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.23",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.25",
+  "title": "qa wave 1",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:qa"
+  ],
+  "created_at": "2026-10-15T03:16:22Z",
+  "closed_at": "2026-10-15T10:17:34Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.34",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.26",
+  "title": "checkpoint: work for app-j8j.26",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-15T03:16:23Z",
+  "closed_at": "2026-10-19T06:48:15Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.25",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.26. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.27",
+  "title": "checkpoint: work for app-j8j.27",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-15T03:16:25Z",
+  "closed_at": "2026-10-19T18:23:20Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.40",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.27. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.28",
+  "title": "merge",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:merge"
+  ],
+  "created_at": "2026-10-15T03:16:26Z",
+  "closed_at": "2026-10-19T18:26:43Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.27",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.29",
+  "title": "checkpoint: work for app-j8j.29",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-15T09:21:58Z",
+  "closed_at": "2026-10-15T09:28:07Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.24",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.29. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.3",
+  "title": "spec",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:spec"
+  ],
+  "created_at": "2026-10-14T12:56:10Z",
+  "closed_at": "2026-10-14T18:55:05Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.2",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.3. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.30",
+  "title": "address round 1",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:address"
+  ],
+  "created_at": "2026-10-15T09:22:00Z",
+  "closed_at": "2026-10-15T09:45:34Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.29",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.30. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.31",
+  "title": "review round 2",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:review"
+  ],
+  "created_at": "2026-10-15T09:45:31Z",
+  "closed_at": "2026-10-15T09:57:27Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.30",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.31. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.32",
+  "title": "checkpoint: work for app-j8j.32",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-15T09:57:16Z",
+  "closed_at": "2026-10-15T10:00:25Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.31",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.32. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.33",
+  "title": "address round 2",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:address"
+  ],
+  "created_at": "2026-10-15T09:57:18Z",
+  "closed_at": "2026-10-15T10:06:12Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.32",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.33. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.34",
+  "title": "review round 3",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:review"
+  ],
+  "created_at": "2026-10-15T10:06:09Z",
+  "closed_at": "2026-10-15T10:12:40Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.33",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.34. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.35",
+  "title": "address round 4",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:address"
+  ],
+  "created_at": "2026-10-19T06:48:09Z",
+  "closed_at": "2026-10-19T06:55:00Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.26",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.35. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.36",
+  "title": "qa wave 2",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:qa"
+  ],
+  "created_at": "2026-10-19T06:48:11Z",
+  "closed_at": "2026-10-19T07:08:58Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.35",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.36. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.37",
+  "title": "checkpoint: work for app-j8j.37",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-19T06:48:12Z",
+  "closed_at": "2026-10-19T16:50:24Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.36",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.37. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.38",
+  "title": "address round 5",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:address"
+  ],
+  "created_at": "2026-10-19T16:50:19Z",
+  "closed_at": "2026-10-19T16:53:06Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.37",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.38. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.39",
+  "title": "qa wave 3",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:qa"
+  ],
+  "created_at": "2026-10-19T16:50:20Z",
+  "closed_at": "2026-10-19T17:30:52Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.38",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.39. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.4",
+  "title": "slice",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:slice"
+  ],
+  "created_at": "2026-10-14T12:56:11Z",
+  "closed_at": "2026-10-15T03:16:41Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.6",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.40",
+  "title": "checkpoint: work for app-j8j.40",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-19T16:50:21Z",
+  "closed_at": "2026-10-19T18:02:37Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.39",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.40. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.5",
+  "title": "checkpoint: work for app-j8j.5",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-14T12:56:13Z",
+  "closed_at": "2026-10-15T03:21:57Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.4",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.5. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.6",
+  "title": "checkpoint: work for app-j8j.6",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "checkpoint",
+   "loop"
+  ],
+  "created_at": "2026-10-14T18:37:10Z",
+  "closed_at": "2026-10-14T19:15:58Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.3",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.6. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.7",
+  "title": "implement: work for app-j8j.7",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:08Z",
+  "closed_at": "2026-10-15T03:45:09Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/180",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.7. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.8",
+  "title": "implement: work for app-j8j.8",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:09Z",
+  "closed_at": "2026-10-15T04:12:05Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/181",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.7",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.8. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-j8j.9",
+  "title": "implement: work for app-j8j.9",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:implement"
+  ],
+  "created_at": "2026-10-15T03:15:12Z",
+  "closed_at": "2026-10-15T04:20:35Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-j8j",
+  "external_ref": "https://github.com/example/app/issues/182",
+  "dependencies": [
+   {
+    "depends_on_id": "app-j8j.8",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-j8j.5",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-j8j.9. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-nvb",
+  "title": "Unit app-nvb: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:22:57Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/54",
+  "description": "Brief for app-nvb. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-oxn",
+  "title": "Unit app-oxn: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:frontend"
+  ],
+  "created_at": "2026-10-20T05:23:29Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/201",
+  "description": "Brief for app-oxn. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-oxn.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:frontend"
+  ],
+  "created_at": "2026-10-20T05:23:32Z",
+  "parent": "app-oxn",
+  "dependencies": [
+   {
+    "depends_on_id": "app-oxn",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-oxn.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1",
+  "title": "Unit app-sb1: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop"
+  ],
+  "created_at": "2026-10-20T05:21:14Z",
+  "notes": "channel: cli\nrepo: app",
+  "description": "",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-sb1.1",
+  "title": "intake",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:intake"
+  ],
+  "created_at": "2026-10-20T05:21:16Z",
+  "closed_at": "2026-10-20T05:24:19Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.10",
+  "title": "sort: work for app-sb1.10",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:10Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.10. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.11",
+  "title": "sort: work for app-sb1.11",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:11Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.11. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.12",
+  "title": "sort: work for app-sb1.12",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:13Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.12. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.13",
+  "title": "sort: work for app-sb1.13",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:14Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.13. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.14",
+  "title": "sort: work for app-sb1.14",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:16Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.14. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.15",
+  "title": "sort: work for app-sb1.15",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:17Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.15. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.16",
+  "title": "intake",
+  "status": "closed",
+  "priority": 1,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:intake"
+  ],
+  "created_at": "2026-10-20T05:24:19Z",
+  "closed_at": "2026-10-21T07:14:09Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.16. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.2",
+  "title": "sort: work for app-sb1.2",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:23:58Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.2. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.3",
+  "title": "sort: work for app-sb1.3",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:23:59Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.3. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.4",
+  "title": "sort: work for app-sb1.4",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:01Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.4. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.5",
+  "title": "sort: work for app-sb1.5",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:02Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.5. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.6",
+  "title": "sort: work for app-sb1.6",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:04Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.6. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.7",
+  "title": "sort: work for app-sb1.7",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:05Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.7. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.8",
+  "title": "sort: work for app-sb1.8",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:07Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.8. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sb1.9",
+  "title": "sort: work for app-sb1.9",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "briefed",
+   "loop",
+   "phase:sort"
+  ],
+  "created_at": "2026-10-20T05:24:08Z",
+  "parent": "app-sb1",
+  "dependencies": [
+   {
+    "depends_on_id": "app-sb1.1",
+    "type": "blocks",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-sb1",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-sb1.9. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-sgv",
+  "title": "Unit app-sgv: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:historic-import"
+  ],
+  "created_at": "2026-10-20T05:23:15Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/88",
+  "description": "Brief for app-sgv. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-t11",
+  "title": "Unit app-t11: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:tests"
+  ],
+  "created_at": "2026-10-20T05:22:05Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/6",
+  "description": "Brief for app-t11. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-t11.1",
+  "title": "reproduce",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:tests"
+  ],
+  "created_at": "2026-10-20T05:22:08Z",
+  "closed_at": "2026-10-20T05:41:24Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-t11",
+  "dependencies": [
+   {
+    "depends_on_id": "app-t11",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-t11.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-t11.2",
+  "title": "checkpoint: work for app-t11.2",
+  "status": "closed",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "applied",
+   "checkpoint",
+   "loop",
+   "phase:decide-fix",
+   "topic:tests"
+  ],
+  "created_at": "2026-10-20T05:41:25Z",
+  "closed_at": "2026-10-20T06:04:19Z",
+  "close_reason": "done, see https://github.com/example/app",
+  "parent": "app-t11",
+  "dependencies": [
+   {
+    "depends_on_id": "app-t11",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-t11.1",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-t11.2. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-t11.3",
+  "title": "fix",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:fix",
+   "topic:tests"
+  ],
+  "created_at": "2026-10-20T05:41:27Z",
+  "parent": "app-t11",
+  "dependencies": [
+   {
+    "depends_on_id": "app-t11",
+    "type": "parent-child",
+    "issue_id": null
+   },
+   {
+    "depends_on_id": "app-t11.2",
+    "type": "blocks",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-t11.3. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-tgx",
+  "title": "Unit app-tgx: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:uploads"
+  ],
+  "created_at": "2026-10-20T05:22:01Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/4",
+  "description": "Brief for app-tgx. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-v8t",
+  "title": "Unit app-v8t: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:wayfinder"
+  ],
+  "created_at": "2026-10-20T05:22:59Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/57",
+  "description": "Brief for app-v8t. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-w01",
+  "title": "Unit app-w01: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:feature-settings"
+  ],
+  "created_at": "2026-10-20T05:22:40Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/37",
+  "description": "Brief for app-w01. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ },
+ {
+  "id": "app-w01.1",
+  "title": "reproduce",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "task",
+  "labels": [
+   "loop",
+   "phase:reproduce",
+   "topic:feature-settings"
+  ],
+  "created_at": "2026-10-20T05:22:43Z",
+  "parent": "app-w01",
+  "dependencies": [
+   {
+    "depends_on_id": "app-w01",
+    "type": "parent-child",
+    "issue_id": null
+   }
+  ],
+  "description": "Brief for app-w01.1. Budget: 100k. Resume from: the artifact of its phase.",
+  "notes": null
+ },
+ {
+  "id": "app-zkh",
+  "title": "Unit app-zkh: a change to the app",
+  "status": "open",
+  "priority": 2,
+  "issue_type": "epic",
+  "labels": [
+   "loop",
+   "topic:tests"
+  ],
+  "created_at": "2026-10-20T05:22:24Z",
+  "notes": "channel: cli\nrepo: app",
+  "external_ref": "https://github.com/example/app/issues/13",
+  "description": "Brief for app-zkh. Budget: 100k. Resume from: the artifact of its phase.",
+  "dependencies": [],
+  "parent": null
+ }
+]
