@@ -201,6 +201,45 @@ rejected. Uncertain launches require inspection, never automatic duplication.
 The terminal `~/.umka/bin/umka inbox` is still available on demand. It uses readline
 and terminal Claude for conversational phases; launchd never runs it.
 
+## Run intake manually
+
+```sh
+# Preview new source items without importing or advancing cursors.
+~/.umka/bin/umka-t3 intake --dry-run
+
+# Import new items and start one fresh T3 classification thread.
+~/.umka/bin/umka-t3 intake
+```
+
+Intake reads this instance's `sources.json` and `cursors.json`. It supports GitHub
+issue sources (`kind: github`, `repo: owner/repo`) and JSON Lines file sources
+(`kind: file`, absolute `path`). Each source needs a unique `name`; optional
+`repo_key` names its checkout in `repos.json`. GitHub polling requires authenticated
+`gh` and reads up to 200 issues per invocation in creation order. File entries
+need `id` and `title`; `text`, `who`, and `created` provide the brief's details.
+With no cursor, intake considers existing source history as well as recent items;
+use the dry run to inspect the initial import.
+
+When new items exist, intake creates one beads epic per external reference and
+starts one fresh T3 thread for the batch, invoking `umka:run intake IDS afk`.
+The classification phase creates or extends sort items and lays bug pre-work.
+The existing tick and inbox jobs handle later phases and human conversations.
+No new items means no model invocation and no thread. **Intake is manual only**;
+no launchd job is installed for it.
+
+Intake uses the same runtime lock and active-turn journal as tick. If a managed
+phase or a manually claimed item is active, it reports `busy` without importing;
+run it again after the phase completes. A dry run can preview sources while busy.
+The dispatcher checks classification artifacts before releasing a completed intake
+turn; incomplete or failed classification stops further work for inspection.
+
+`t3code/intake.json` preserves a pending import batch across interruptions. Imported
+epics are reconciled by external reference before retrying, and cursors advance
+only after the batch's imports and notes are saved. Lost T3 launch responses stop
+for inspection through `t3code/runner.json`, rather than launching duplicates.
+Do not run the terminal `umka intake` concurrently against this home: that command
+still starts terminal Claude and does not share the T3 runtime lock.
+
 ## Repeat the integration tests
 
 The fixture generators refuse existing directories. Use a new scratch directory
@@ -231,5 +270,4 @@ Test a colleague's installation, including binary installation, phase skills,
 credentials and repo toolchains. Exercise a real T3 restart on a test machine,
 then add the bos deployment layer. The installed plugin's original `umka tick`
 continues to launch terminal Claude; use `umka-t3 tick` for T3 execution.
-Source polling is still the separate `umka intake` command and is not scheduled
-by this adapter. A new request can be started directly with `/umka:run <source>`.
+Source polling is available through manual `umka-t3 intake`; it is not scheduled. A new request can be started directly with `/umka:run <source>`.

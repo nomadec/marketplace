@@ -79,3 +79,15 @@ to the later bos layer.
   so its successor cannot run automatically.
 - Setup verification and default Claude plugin validation still pass. The existing
   public-directory metadata findings above remain unchanged.
+
+## Manual T3 intake verification (October 26)
+
+- All 56 automated tests pass, including source previews, empty/duplicate intake,
+  partial-import recovery, lost create/launch responses, shared worker exclusion,
+  fresh threads on subsequent batches, and bug classification pre-work.
+- An isolated JSON Lines source was previewed without imports, then imported into
+  one epic and classified in a real fresh T3 thread. The phase set its topic and
+  class and laid one sort item. A concurrent invocation returned busy; a repeated
+  invocation after completion returned empty, with no duplicate epic or thread.
+- The live GitHub source dry run succeeded without importing or advancing its
+  cursor. Local setup verification still passes. Intake has no launchd job.

@@ -4,7 +4,7 @@ import { command, root, write, shellQuote, withLock } from './umka-t3code.mjs';
 import { load } from '../umka/skills/run/phases.mjs';
 import { decide, modeOf } from '../umka/skills/run/pick.mjs';
 
-const runtimeLock = (o, work) => withLock(`${o.home}:runtime`, work, () => ({ status: 'busy', reason: 'locked' }));
+export const runtimeLock = (o, work) => withLock(`${o.home}:runtime`, work, () => ({ status: 'busy', reason: 'locked' }));
 
 export function options(home) {
   const receipt = JSON.parse(fs.readFileSync(path.join(home, 't3code/setup.json'), 'utf8'));
@@ -17,7 +17,7 @@ export function readQueue(o, run = command) {
   const issues = JSON.parse(run('bd', ['-C', o.home, 'list', '--all', '-n', '0', '--json']));
   return { issues, phases, decision: decide(issues, phases) };
 }
-function journal(o) {
+export function journal(o) {
   const file = path.join(o.home, 't3code/runner.json');
   return { file, data: fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { active: null, history: [] } };
 }
@@ -28,14 +28,27 @@ function progressed(before, after) {
   return after && (after.status !== before.status || JSON.stringify(after.labels || []) !== JSON.stringify(before.labels || []) || after.description !== before.description);
 }
 
-function settleActive(o, j, run) {
+export function settleActive(o, j, run) {
   const a = j.data.active;
   if (!a) return;
   if (!a.threadId) throw new Error('A prior T3 launch has an uncertain outcome. Inspect t3code/runner.json and T3 before any retry.');
   const { thread } = JSON.parse(t3call(o, run, ['thread', 'show', a.threadId, '--messages', '1', '--json']));
-  if (['running', 'queued', 'waiting', 'idle'].includes(thread.status)) return { status: 'busy', itemId: a.itemId, threadId: a.threadId };
+  if (['running', 'queued', 'waiting', 'idle'].includes(thread.status)) return { status: 'busy', itemId: a.itemId, ...(a.epicIds ? { epicIds: a.epicIds } : {}), threadId: a.threadId };
   if (thread.status !== 'completed') throw new Error(`T3 turn ${a.threadId} ended as ${thread.status}; inspect it before retrying`);
   const { issues } = readQueue(o, run);
+  if (a.kind === 'intake') {
+    for (const id of a.epicIds) {
+      const epic = issues.find(i => i.id === id);
+      const classification = /^class: (bug|proposal|spec|ticket|question|idea)$/m.exec(epic?.notes || '');
+      const topic = epic?.labels?.some(l => l.startsWith('topic:'));
+      const reproduced = classification?.[1] !== 'bug' || issues.some(i => i.parent === id && i.labels?.includes('phase:reproduce'));
+      if (!classification || !topic || !reproduced) throw new Error(`T3 intake ${a.threadId} did not finish classifying ${id}; inspect it before retrying`);
+    }
+    j.data.history.push({ kind: 'intake', intakeBatchId: a.intakeBatchId, epicIds: a.epicIds, threadId: a.threadId, result: 'classified' });
+    j.data.active = null;
+    write(j.file, j.data);
+    return;
+  }
   const after = issues.find(i => i.id === a.itemId);
   if (a.human && after?.status === 'in_progress') return { status: 'busy', itemId: a.itemId, threadId: a.threadId };
   // A human may ask a question before claiming the phase. Release that reservation.
@@ -175,6 +188,10 @@ export async function runtimeMain() {
   if (action === 'tick') {
     if (args.some(a => a !== '--dry-run')) throw new Error('tick accepts only --dry-run');
     result = tick(o, { dry: args.includes('--dry-run') });
+  } else if (action === 'intake') {
+    if (args.some(a => a !== '--dry-run')) throw new Error('intake accepts only --dry-run');
+    const { intake } = await import('./umka-t3-intake.mjs');
+    result = intake(o, { dry: args.includes('--dry-run') });
   } else if (action === 'inbox') result = inbox(o);
   else if (action === 'inbox-open' && !args.length) result = openInbox(o);
   else if (action === 'inbox-resume' && args.length === 1) result = resumeInbox(o, args[0]);
@@ -183,7 +200,7 @@ export async function runtimeMain() {
   else if (['schedule-install', 'enable', 'disable', 'schedule-status', 'schedule-run', 'schedule-uninstall'].includes(action)) {
     const { schedule } = await import('./umka-t3-schedule.mjs');
     result = await schedule(o, action, args);
-  } else throw new Error('usage: umka-t3 tick [--dry-run] | inbox | inbox-open | work ID | answer ID --file PATH | schedule-install [--every-ms N] | enable | disable | schedule-status | schedule-run | schedule-uninstall | inbox-resume ID');
+  } else throw new Error('usage: umka-t3 tick [--dry-run] | intake [--dry-run] | inbox | inbox-open | work ID | answer ID --file PATH | schedule-install [--every-ms N] | enable | disable | schedule-status | schedule-run | schedule-uninstall | inbox-resume ID');
   // Both launchd jobs can fire together. Retry only short-lived lock contention.
   for (let retry = 0; quiet && result?.reason === 'locked' && retry < 10; retry++) {
     await new Promise(resolve => setTimeout(resolve, 200));
