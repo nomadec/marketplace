@@ -1,69 +1,117 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { createHash, randomUUID } from 'node:crypto';
-import { command, write, shellQuote } from './umka-t3code.mjs';
+import { createHash } from 'node:crypto';
+import { command, root, write } from './umka-t3code.mjs';
 import { withT3Api } from './t3-api.mjs';
-import { t3call } from './umka-t3-runtime.mjs';
 
+// Retain the old ID solely to disable an installed native, agent-backed timer.
 export function scheduleId(o) {
   return `umka:${createHash('sha256').update(o.home).update('\0').update(o.instance).digest('hex').slice(0, 24)}`;
 }
-export function schedulePrompt(o) {
-  return `Umka scheduled tick for instance ${o.instance}. Run exactly this shell command:\n${shellQuote(path.join(o.home, 'bin/umka-t3'))} tick\nThe command selects and launches at most one phase in a separate T3 thread, and prevents overlapping managed turns. Do not run umka tick or umka inbox, invoke a skill yourself, answer human checkpoints, modify the runner journal, or launch extra work. If the command reports idle, busy, or waiting, stop without a status message. If it started work, report its item ID and thread ID in one line. If it fails, report the error so the owner can inspect it. Human decisions belong in the Umka inbox or the phase's thread.`;
+const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
+export function plist(job, o, everyMs, envPath = process.env.PATH || '/usr/bin:/bin', node = process.execPath) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>${escape(job.label)}</string>
+<key>ProgramArguments</key><array>${[node, path.join(root, 'scripts/umka-t3'), o.home, job.action, '--quiet'].map(a => `<string>${escape(a)}</string>`).join('')}</array>
+<key>WorkingDirectory</key><string>${escape(o.project)}</string>
+<key>EnvironmentVariables</key><dict><key>PATH</key><string>${escape(envPath)}</string><key>UMKA_HOME</key><string>${escape(o.home)}</string></dict>
+<key>StartInterval</key><integer>${everyMs / 1000}</integer>
+<key>RunAtLoad</key><true/>
+<key>Disabled</key><true/>
+<key>Umask</key><integer>63</integer>
+<key>StandardOutPath</key><string>/dev/null</string>
+<key>StandardErrorPath</key><string>/dev/null</string>
+</dict></plist>
+`;
 }
-export async function schedule(o, action, args = [], connect = withT3Api, run = command) {
-  let everyMs = 300000;
+
+export async function schedule(o, action, args = [], connect = withT3Api, run = command, host = {}) {
+  if ((host.platform || process.platform) !== 'darwin') throw new Error('Umka launchd scheduling requires macOS');
+  let everyMs = 10000;
   if (args.length) {
     if (action !== 'schedule-install' || args.length !== 2 || args[0] !== '--every-ms') throw new Error('Only schedule-install accepts --every-ms N');
     everyMs = Number(args[1]);
-    if (!Number.isSafeInteger(everyMs) || everyMs < 60000) throw new Error('Schedule interval must be at least 60000 milliseconds');
+    if (!Number.isSafeInteger(everyMs) || everyMs < 1000 || everyMs % 1000) throw new Error('Interval must be a whole number of seconds, at least 1000 milliseconds');
   }
   const folder = path.join(o.home, 't3code');
-  fs.mkdirSync(folder, { recursive: true });
+  const agentDir = path.join(host.userHome || os.homedir(), 'Library/LaunchAgents');
+  const domain = `gui/${host.uid ?? process.getuid()}`;
+  const prefix = `com.nomadec.umka.${scheduleId(o).slice(5)}`;
+  const jobs = ['tick', 'inbox-open'].map(action => {
+    const label = `${prefix}.${action === 'tick' ? 'tick' : 'inbox'}`;
+    return { action, label, file: path.join(agentDir, `${label}.plist`), target: `${domain}/${label}` };
+  });
+  const loaded = job => {
+    try { run('/bin/launchctl', ['print', job.target]); return true; }
+    catch (e) { if (/could not find service|not found|no such process/i.test(e.message)) return false; throw e; }
+  };
+  const unload = job => { if (loaded(job)) run('/bin/launchctl', ['bootout', job.target]); };
+  const load = job => {
+    run('/bin/launchctl', ['enable', job.target]);
+    if (!loaded(job)) run('/bin/launchctl', ['bootstrap', domain, job.file]);
+  };
+  const disable = job => {
+    run('/bin/launchctl', ['disable', job.target]);
+    unload(job);
+  };
+  const statePath = path.join(folder, 'launchd.json');
+  if (action === 'schedule-status') {
+    const state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) : null;
+    return { backend: 'launchd', everyMs: state?.everyMs ?? null, jobs: jobs.map(job => ({ ...job, installed: fs.existsSync(job.file), loaded: loaded(job) })) };
+  }
+  // The filesystem lock spans async API migration as well as launchctl mutations.
   const lock = path.join(folder, 'schedule.lock');
-  try { fs.mkdirSync(lock); } catch (e) { if (e.code !== 'EEXIST') throw e; throw new Error(`Schedule setup is already active or interrupted. Inspect ${lock} before removing it.`); }
+  fs.mkdirSync(folder, { recursive: true });
+  try { fs.mkdirSync(lock); } catch (e) { if (e.code !== 'EEXIST') throw e; throw new Error(`Schedule management active or interrupted; inspect ${lock}`); }
   try {
     fs.writeFileSync(path.join(lock, 'pid'), String(process.pid));
-    return await connect(o, async api => {
-      const id = scheduleId(o);
-      const { tasks } = await api.rpc('scheduledTasks.list');
-      const existing = tasks.find(t => t.id === id);
-      if (action === 'schedule-status') return existing || { id, status: 'not-installed' };
-      if (action !== 'schedule-install') {
-        if (!existing) throw new Error('Run schedule-install first');
-        if (action === 'schedule-run') return api.rpc('scheduledTasks.runNow', { id });
-        if (!['enable', 'disable'].includes(action)) throw new Error(`Unknown schedule action: ${action}`);
-        return api.rpc('scheduledTasks.setEnabled', { id, enabled: action === 'enable' });
+    let state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) : null;
+    if (action === 'schedule-install') {
+      // Disable the old timer before any new dispatcher can run. Failure stops migration.
+      const legacyPath = path.join(folder, 'schedule.json');
+      if (fs.existsSync(legacyPath)) {
+        const legacy = JSON.parse(fs.readFileSync(legacyPath, 'utf8'));
+        if (legacy.scheduledTaskId && !legacy.disabledForLaunchd) {
+          await connect(o, async api => {
+            const { tasks } = await api.rpc('scheduledTasks.list');
+            const old = tasks.find(t => t.id === legacy.scheduledTaskId);
+            if (old?.enabled) await api.rpc('scheduledTasks.setEnabled', { id: old.id, enabled: false });
+          });
+          write(legacyPath, { ...legacy, disabledForLaunchd: true });
+        }
       }
-      const { projects } = await api.projects();
-      const project = projects.find(p => p.workspaceRoot === o.project && p.deletedAt === null);
-      if (!project) throw new Error('The exact T3 project is missing; rerun setup apply');
-      const statePath = path.join(folder, 'schedule.json');
-      let state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) : {};
-      if (!state.threadId && existing?.threadId) state = { threadId: existing.threadId };
-      if (!state.threadId) {
-        if (state.launching) throw new Error('Scheduler chat launch is uncertain; inspect T3 and schedule.json before retrying');
-        write(statePath, { launching: true });
-        const launch = JSON.parse(t3call(o, run, ['thread', 'start', project.id, `This is the scheduler control chat for Umka instance ${o.instance}. Setup will bind a recurring task here. No product work is requested now. Reply only: Umka scheduler ready.`, '--title', `Umka ${o.instance}: scheduler`, '--json']));
-        if (!launch.threadId) throw new Error('T3 returned no scheduler thread id');
-        state = { threadId: launch.threadId };
-        write(statePath, state);
+      fs.mkdirSync(agentDir, { recursive: true });
+      const enabled = state?.enabled ?? false;
+      state = { backend: 'launchd', everyMs, enabled, jobs };
+      // Preserve PATH at install time; launchd does not read interactive shell profiles.
+      for (const job of jobs) {
+        const contents = plist(job, o, everyMs);
+        const changed = !fs.existsSync(job.file) || fs.readFileSync(job.file, 'utf8') !== contents;
+        if (changed) { unload(job); write(job.file, contents); }
+        if (enabled) load(job);
+        else disable(job);
       }
-      const { thread } = JSON.parse(t3call(o, run, ['thread', 'show', state.threadId, '--messages', '1', '--json']));
-      if (!thread.providerInstanceId || !thread.model) throw new Error('T3 scheduler thread has no model selection');
-      const payload = {
-        id, commandId: `umka-setup:${randomUUID()}`, title: `Umka ${o.instance}: tick`,
-        prompt: schedulePrompt(o), enabled: existing?.enabled ?? false,
-        schedule: { type: 'interval', everyMs }, projectId: project.id, threadId: state.threadId,
-        workspaceStrategy: { type: 'root' },
-        modelSelection: { instanceId: thread.providerInstanceId, model: thread.model },
-        runtimeMode: thread.runtimeMode, interactionMode: thread.interactionMode,
-        createdBy: 'user', creationSource: 'mcp',
-      };
-      // Stable ID reconciles a timeout or interrupted response without duplicate schedules.
-      const result = await api.rpc('scheduledTasks.upsert', payload);
-      write(statePath, { threadId: state.threadId, scheduledTaskId: id });
-      return result;
-    });
+      write(statePath, state);
+      return state;
+    }
+    if (!state) throw new Error('Run schedule-install first');
+    if (action === 'schedule-uninstall') {
+      for (const job of jobs) { unload(job); fs.rmSync(job.file, { force: true }); }
+      fs.rmSync(statePath);
+      return { status: 'uninstalled' };
+    }
+    if (action === 'schedule-run') {
+      for (const job of jobs) run(process.execPath, [path.join(root, 'scripts/umka-t3'), o.home, job.action]);
+      return { status: 'checked' };
+    }
+    if (!['enable', 'disable'].includes(action)) throw new Error(`Unknown schedule action: ${action}`);
+    // Persist intent first so a failed or interrupted enable can be retried.
+    state.enabled = action === 'enable';
+    write(statePath, state);
+    for (const job of jobs) state.enabled ? load(job) : disable(job);
+    return state;
   } finally { fs.rmSync(lock, { recursive: true }); }
 }

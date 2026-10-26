@@ -6,11 +6,12 @@ T3. The script is a Node executable invoked from a shell; it has no npm dependen
 
 The layers remain separate: bos, T3 Code, Umka with a runtime, channels, and UI.
 This is the local Umka layer. It does not install a T3 service or configure Slack.
-`apply` installs both CLI wrappers. Scheduling is installed and enabled explicitly
+`apply` installs both CLI wrappers. Two macOS launchd jobs are installed and enabled explicitly
 through `umka-t3`, so reapplying setup never changes an existing schedule's state.
 
 ## Prerequisites
 
+- macOS with a logged-in desktop session (user LaunchAgents).
 - Node 22.3 or newer, Git, Claude Code with authentication, and **bd 1.3.1** on PATH.
   The script checks the exact bd version and never upgrades or migrates a database.
   Installing these binaries is currently a prerequisite, not automated by this script.
@@ -98,7 +99,7 @@ thread ID, original prompt and latest thread response remain there as evidence.
 The prompt binds every beads command to the isolated home. This verifies the
 agent's behavior; it is not an OS sandbox or a separate credential boundary.
 
-## Schedule T3 turns
+## Schedule deterministic checks with launchd
 
 For the default home:
 
@@ -109,71 +110,96 @@ For the default home:
 ~/.umka/bin/umka-t3 enable
 ```
 
-The interval defaults to five minutes. `schedule-install --every-ms 60000` selects
-one minute, the minimum T3 supports. First installation is disabled; reinstalling
-preserves the enabled state and reuses the same schedule and scheduler chat.
+`schedule-install` writes two user LaunchAgent plists under `~/Library/LaunchAgents`,
+with instance/home-specific labels. Both default to **10 seconds**:
 
-`disable` pauses future triggers; it does not interrupt a phase already running.
-`schedule-run` triggers one check immediately, including while the schedule is
-disabled. `tick` also dispatches one check directly from the terminal, with the
-work itself still running in a visible T3 thread.
+- `tick`: selects and launches at most one autonomous phase in a fresh T3 thread.
+- `inbox-open`: opens one conversation per ready, briefed human item that does not
+  already have a conversation. A phase thread that posted the brief is reused.
 
-The scheduler chat runs the deterministic dispatcher and stops. When work is
-ready, the dispatcher starts one fresh phase thread. A durable launch record
-prevents another managed tick from launching during startup or execution. An
-unknown launch outcome, failed thread, or completed turn with no recorded progress
-stops further launches for inspection. Existing in-progress beads items also block
-the dispatcher. This is one managed turn per instance, not a general multi-runner
-claim protocol. Do not co-run terminal ticks against the same home.
+Neither check invokes a model when there is nothing to dispatch. There is no
+scheduler chat or shared inbox chat. Checks run directly as Node processes;
+`launchd` supplies the timer. A check may take longer than ten seconds; launchd
+does not overlap invocations of the same job. The jobs share a runtime lock,
+and briefly retry live lock contention so simultaneous timer firings can both run.
 
-T3's native timer wakes an agent even for an empty queue. It may leave idle-check
-messages in the separate scheduler chat. The inbox chat is refreshed on demand.
+First installation is disabled. `enable` loads both jobs and checks immediately;
+they run again at the interval while you remain logged in. Reinstalling preserves
+the enabled intent and does not reload unchanged jobs. Use
+`schedule-install --every-ms 10000` to select the interval explicitly. The value
+must be a positive whole number of seconds, expressed in milliseconds.
 
-Runtime evidence is under `t3code/runner.json`, `schedule.json`, and `inbox.json`.
-On an uncertain launch, inspect the named T3 thread and bead before repairing the
-journal; never clear it while work might still be running. Setup and schedule
-commands use separate locks and report the lock path after an interrupted operation.
+`disable` persistently disables and unloads both jobs, including across login, without interrupting a T3 phase already launched.
+`schedule-run` executes both checks once from the terminal, including while
+disabled. `schedule-uninstall` unloads both jobs and removes their plists and
+launchd receipt. These commands affect only this instance's jobs.
 
-The adapter uses T3's native protocol-2 API, verified with T3 0.1.2. Each management
-call obtains a five-minute token through `t3 auth session issue`, restricted to
-orchestration read/operate, and revokes it afterward. Tokens stay in memory. It
-reads the local server's runtime address, requests a WebSocket ticket, and uses
-the same schedule RPCs as T3. It never edits T3's database. A protocol/API change
-may require updating this adapter. The server is rediscovered on each call.
+The plists use the absolute Node executable and bind the instance home and project.
+Installation captures PATH because launchd does not load interactive shell profiles.
+Reinstall after moving the checkout, changing Node installations, or changing the
+PATH needed by beads/T3 and their dependencies.
 
-The Mac must be awake and T3 must be running. This setup does not keep a laptop
-awake or provide a 24/7 host. Schedules live in T3; this test did not restart the
-user's desktop application. The later bos layer supplies the always-on host.
+A durable launch journal prevents overlapping managed phases and duplicate threads
+after a crash. Unknown launch outcomes, failed phase threads, and autonomous phases
+that finish without recorded progress stop dispatch for inspection. Existing
+in-progress beads items also block autonomous execution. Do not co-run terminal
+queue ticks against the same home.
 
-## Use the inbox
+Inspect the bounded status files (one latest result or error, overwritten each check):
 
-There are two interfaces to the same beads home:
+```sh
+cat ~/.umka/t3code/tick-status.json
+cat ~/.umka/t3code/inbox-open-status.json
+```
 
-| Interface | Where it runs | How to use it |
-| --- | --- | --- |
-| Terminal inbox | Your Mac terminal, on demand | `~/.umka/bin/umka inbox` |
-| T3 inbox | The `Umka local: inbox` chat | Run `~/.umka/bin/umka-t3 inbox-open` once, then select that chat in T3 |
+`schedule-status` reports whether each job is installed and loaded; `launchd.json`
+records configuration and enabled intent. Quiet scheduled checks write no terminal
+or chat messages. They do not grow an idle/error log.
 
-In the T3 inbox, say **“refresh my inbox”**. It lists waiting items and their
-briefs. Reply with an item ID and your decision, for example **“For u-123.2:
-approved, keep the proposed scope.”** It records your exact answer in beads.
-The next tick applies that answer in a fresh phase thread. No terminal needs to
-stay open. The inbox refreshes on request; it is not a Slack notification service.
+### Migration from the native T3 timer
 
-You can also reply directly in the T3 phase thread that posted a brief. Phases
-that need a conversation, such as grill, are opened with `umka-t3 work ITEM_ID`;
-the adapter refuses to treat them as simple yes/no approvals. Read any item-specific
-instructions before answering: some checkpoints also require edits to a proposal,
-questionnaire or downstream brief.
+On an existing installation, `schedule-install` disables the native timer recorded
+in `t3code/schedule.json` before writing the new jobs. If T3 is unavailable or that
+operation fails, installation stops. It leaves unrelated schedules alone. An
+already-running native scheduler turn is not cancelled; shared dispatch locking
+still prevents duplicate work. Old scheduler and shared inbox chats remain as
+history; the new jobs never refresh or append to them.
 
-`umka-t3 inbox` prints the waiting items and known thread IDs without prompting.
-`umka-t3 answer ITEM_ID --file PATH` records a simple decision from a UTF-8 file;
-the inbox chat uses this noninteractive interface. It rejects an item that is no
-longer ready or a decision that requires a conversation.
+The migration alone uses T3's protocol-2 schedule API with a short-lived,
+revoked-after-use local orchestration session. Normal launchd checks use the
+existing T3 CLI, never T3's database or an agent-backed scheduler.
 
-The terminal inbox remains available: it uses readline, closes simple decisions
-with their answer, and starts terminal Claude for conversational phases. It exits
-when done. It is never run inside a scheduled T3 task.
+The Mac must be awake and T3 must be running to launch/read threads. While T3 is
+unavailable, checks report failures in their status files. Read failures retry
+on later intervals; a failed launch has an uncertain outcome and requires inspection
+before dispatch resumes.
+This setup does not keep the Mac awake or provide always-on hosting.
+
+## Use the per-item inbox
+
+The launchd inbox job discovers waiting items automatically every ten seconds.
+Open the individual `Umka local: ITEM_ID TITLE` threads in T3 and reply to each
+question there. You no longer need to say “refresh my inbox” in a shared chat.
+To dispatch immediately, run `~/.umka/bin/umka-t3 inbox-open` from a terminal.
+An empty inbox creates no threads. Repeated checks reuse the persisted item/thread
+mapping in `t3code/inbox-items.json`, without sending refresh messages.
+
+For a checkpoint or a reply-form decision, the thread records your explicit answer
+through `umka-t3 answer ITEM_ID --file PATH`. The next tick applies it in a fresh
+phase thread. Interactive phases, such as grill, continue in that item's thread;
+before doing phase work, the agent reserves the runner through `inbox-resume ID`.
+If another managed phase is active, it asks you to retry when that phase finishes.
+Simply waiting for your first reply does not occupy the autonomous worker slot.
+
+`umka-t3 inbox` prints waiting items and known phase thread IDs without prompting.
+`umka-t3 work ITEM_ID` remains a manual way to start an attended phase. Prefer the
+already-open item thread to keep its human conversation together. Some checkpoints
+also require edits to proposals, questionnaires, or downstream briefs; follow the
+item-specific instructions before answering. Stale or no-longer-ready answers are
+rejected. Uncertain launches require inspection, never automatic duplication.
+
+The terminal `~/.umka/bin/umka inbox` is still available on demand. It uses readline
+and terminal Claude for conversational phases; launchd never runs it.
 
 ## Repeat the integration tests
 
@@ -196,9 +222,8 @@ node scripts/create-t3-inbox-test.mjs /absolute/scratch/inbox-cycle
 /absolute/scratch/inbox-cycle/home/bin/umka-t3 inbox-open
 ```
 
-The fixture starts a checkpoint-brief turn. Once it completes, answer that
-synthetic checkpoint in its test inbox chat. Run a T3 tick and verify the exact
-answer, the `applied` label, and one successor phase. Do not execute the successor.
+The fixture creates one already-briefed checkpoint and opens its per-item thread.
+Answer that synthetic checkpoint there. Run a T3 tick and verify the exact answer, the `applied` label, and one successor phase. Do not execute the successor.
 
 ## Remaining rollout checks
 

@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { tick, inbox, answer, openInbox } from './umka-t3-runtime.mjs';
-import { schedule, scheduleId } from './umka-t3-schedule.mjs';
+import { tick, inbox, answer, openInbox, resumeInbox } from './umka-t3-runtime.mjs';
+import { withLock } from './umka-t3code.mjs';
 
 function fixture(t) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'umka-runtime-'));
@@ -81,33 +81,90 @@ test('interactive phases cannot be silently closed through the answer command', 
   assert.equal(tick(f.o, { attendedId: 'u-1.1' }, f.run).status, 'started');
 });
 
-test('inbox chat is reused rather than sending unsolicited refresh messages', t => {
+test('empty inbox checks never call T3 or create an inbox journal', t => {
   const f = fixture(t);
-  assert.deepEqual(openInbox(f.o, f.run), openInbox(f.o, f.run));
+  assert.equal(openInbox(f.o, f.run).status, 'empty');
+  assert.equal(f.state.launches, 0);
+  assert.equal(fs.existsSync(path.join(f.o.home, 't3code/inbox-items.json')), false);
+});
+
+test('each waiting item has one conversation across repeated inbox checks and restarts', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', title: 'another checkpoint' });
+  const first = openInbox(f.o, f.run);
+  assert.equal(first.items.length, 2);
+  assert.equal(f.state.launches, 2);
+  assert.deepEqual(openInbox({ ...f.o }, f.run).items.map(i => i.threadId), first.items.map(i => i.threadId));
+  assert.equal(f.state.launches, 2);
+  answer(f.o, 'u-1.1', 'Approved', f.run);
+  assert.equal(openInbox(f.o, f.run).items.length, 1);
+  assert.equal(f.state.launches, 2);
+});
+
+test('a phase thread that produced the brief becomes its inbox conversation', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint'];
+  tick(f.o, {}, f.run);
+  f.state.threadStatus = 'completed';
+  f.state.issues[1].labels.push('briefed');
+  assert.equal(openInbox(f.o, f.run).items[0].threadId, 'thread-1');
+  assert.equal(f.state.launches, 1);
+  assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+});
+
+test('uncertain inbox launches never duplicate a conversation', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:grill', 'briefed'];
+  f.state.failLaunch = true;
+  assert.throws(() => openInbox(f.o, f.run), /Lost response/);
+  f.state.failLaunch = false;
+  assert.throws(() => openInbox(f.o, f.run), /uncertain/);
   assert.equal(f.state.launches, 1);
 });
 
-test('schedule install is idempotent, preserves enabled state, and disable is reversible', async t => {
+test('waiting inbox items do not occupy the worker; interactive replies reserve their existing thread', t => {
   const f = fixture(t);
-  let task;
-  const api = {
-    projects: async () => ({ projects: [{ id: 'project', workspaceRoot: f.o.project, deletedAt: null }] }),
-    rpc: async (method, payload) => {
-      if (method === 'scheduledTasks.list') return { tasks: task ? [task] : [] };
-      if (method === 'scheduledTasks.upsert') { task = { ...payload }; return { task }; }
-      if (method === 'scheduledTasks.setEnabled') { task.enabled = payload.enabled; return { task }; }
-      throw new Error(`Unexpected ${method}`);
-    },
-  };
-  const connect = async (_o, action) => action(api);
-  await schedule(f.o, 'schedule-install', [], connect, f.run);
-  assert.equal(task.enabled, false);
-  assert.equal(task.id, scheduleId(f.o));
-  await schedule(f.o, 'enable', [], connect, f.run);
-  await schedule(f.o, 'schedule-install', [], connect, f.run);
-  assert.equal(task.enabled, true);
+  f.state.issues[1].labels = ['phase:grill', 'briefed'];
+  openInbox(f.o, f.run);
+  assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+  assert.equal(resumeInbox(f.o, 'u-1.1', f.run).status, 'reserved');
+  assert.equal(tick(f.o, {}, f.run).status, 'busy');
+  f.state.threadStatus = 'completed';
+  f.state.issues[1].status = 'in_progress';
+  assert.equal(tick(f.o, {}, f.run).status, 'busy');
+  assert.equal(resumeInbox(f.o, 'u-1.1', f.run).status, 'reserved');
+  f.state.issues[1].status = 'closed';
+  f.state.issues[1].labels.push('applied');
+  assert.equal(tick(f.o, {}, f.run).status, 'idle');
   assert.equal(f.state.launches, 1);
-  await schedule(f.o, 'disable', [], connect, f.run);
-  assert.equal(task.enabled, false);
-  assert.equal(task.schedule.everyMs, 300000);
+});
+
+test('inbox and tick share a lock and a live owner causes a harmless skip', t => {
+  const f = fixture(t);
+  withLock(`${f.o.home}:runtime`, () => {
+    assert.equal(tick(f.o, {}, f.run).reason, 'locked');
+    assert.equal(openInbox(f.o, f.run).reason, 'locked');
+  });
+  assert.equal(f.state.launches, 0);
+});
+
+test('inbox conversations can open while an unrelated autonomous phase is running', t => {
+  const f = fixture(t);
+  tick(f.o, {}, f.run);
+  f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', title: 'approval', labels: ['phase:approve-proposal', 'briefed'] });
+  assert.equal(openInbox(f.o, f.run).items[0].itemId, 'u-1.2');
+  assert.equal(f.state.launches, 2);
+  assert.equal(resumeInbox(f.o, 'u-1.2', f.run).status, 'busy');
+});
+
+test('a human clarification without claiming work releases the worker slot', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:grill', 'briefed'];
+  openInbox(f.o, f.run);
+  resumeInbox(f.o, 'u-1.1', f.run);
+  f.state.threadStatus = 'completed';
+  assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+  f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', labels: ['phase:answer'] });
+  assert.equal(tick(f.o, {}, f.run).status, 'started');
 });

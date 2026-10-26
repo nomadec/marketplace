@@ -1,3 +1,12 @@
 #!/usr/bin/env node
+import path from 'node:path';
+import { write } from './umka-t3code.mjs';
 import { runtimeMain } from './umka-t3-runtime.mjs';
-runtimeMain().catch(error => { console.error(`umka-t3: ${error.message}`); process.exitCode = 1; });
+runtimeMain().catch(error => {
+  const [home, action, ...args] = process.argv.slice(2);
+  if (home && ['tick', 'inbox-open'].includes(action) && args.includes('--quiet')) {
+    // One bounded status file per job, including failures; no growing idle/error log.
+    write(path.join(home, 't3code', `${action}-status.json`), { checkedAt: new Date().toISOString(), error: error.message });
+  } else console.error(`umka-t3: ${error.message}`);
+  process.exitCode = 1;
+});

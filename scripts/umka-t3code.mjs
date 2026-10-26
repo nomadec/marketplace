@@ -99,11 +99,17 @@ export function digest(dir) {
 export const shellQuote = s => `'${s.replaceAll("'", "'\\''")}'`;
 function t3(o, run, args) { return run(o.t3, [...args, ...(o.t3Home ? ['--base-dir', o.t3Home] : [])]); }
 
-export function withLock(key, work) {
+export function withLock(key, work, onBusy) {
   const lock = path.join(os.tmpdir(), `umka-t3code-${createHash('sha256').update(key).digest('hex').slice(0, 24)}.lock`);
   try { fs.mkdirSync(lock, { mode: 0o700 }); }
   catch (e) {
     if (e.code !== 'EEXIST') throw e;
+    if (onBusy) {
+      const pid = Number(fs.readFileSync(path.join(lock, 'pid'), 'utf8'));
+      if (Number.isInteger(pid) && pid > 0) {
+        try { process.kill(pid, 0); return onBusy(); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+      }
+    }
     throw new Error(`Another setup operation may be active (${lock}). After a crash, inspect the recorded PID and outcome before removing this lock.`);
   }
   try {
