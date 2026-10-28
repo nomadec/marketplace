@@ -166,11 +166,12 @@ function systemdFixture(t) {
 }
 
 // Lets a real systemd parse the generated units when the host has one; the fixture only mocks systemctl.
+// System scope parses the files offline, so this also works on headless hosts with no user manager.
 function verifyUnits(jobs) {
   const analyze = spawnSync('systemd-analyze', ['--version'], { stdio: 'ignore' });
   if (analyze.error || analyze.status !== 0) return;
   for (const job of jobs) {
-    const r = spawnSync('systemd-analyze', ['--user', 'verify', job.service, job.file], { encoding: 'utf8' });
+    const r = spawnSync('systemd-analyze', ['verify', job.service, job.file], { encoding: 'utf8' });
     assert.equal(r.status, 0, `${job.label}: ${r.stderr}`);
     assert.doesNotMatch(r.stderr, /fatal error|not absolute/);
   }
