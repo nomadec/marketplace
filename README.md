@@ -29,9 +29,9 @@ Then `/umka:run` works in any new session. See `umka/README.md` for the loop, it
 Use `scripts/setup-umka-t3code check`, then `apply` and `verify`, to configure an
 Umka instance for an existing local T3 installation. `smoke` runs one isolated
 AFK phase in a real T3 thread. The generated `~/.umka/bin/umka-t3` command provides
-`schedule-install`, `enable`, `disable`, `tick`, and `inbox-open`. Two macOS
-launchd jobs check work and the per-item inbox every 10 seconds; empty checks
-do not invoke an agent. Run `~/.umka/bin/umka-t3 intake [--dry-run]` manually to
+`schedule-install`, `enable`, `disable`, `tick`, and `inbox-open`. Two timer jobs,
+launchd on macOS or systemd user timers on Linux, check work and the per-item inbox
+every 10 seconds; empty checks do not invoke an agent. Run `~/.umka/bin/umka-t3 intake [--dry-run]` manually to
 import source items and classify them in a fresh T3 thread. The terminal
 `~/.umka/bin/umka inbox` also remains available. See [the setup guide](docs/setup/umka-t3code.md)
 for prerequisites, repeated runs and current limits, and

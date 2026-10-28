@@ -6,12 +6,15 @@ T3. The script is a Node executable invoked from a shell; it has no npm dependen
 
 The layers remain separate: bos, T3 Code, Umka with a runtime, channels, and UI.
 This is the local Umka layer. It does not install a T3 service or configure Slack.
-`apply` installs both CLI wrappers. Two macOS launchd jobs are installed and enabled explicitly
-through `umka-t3`, so reapplying setup never changes an existing schedule's state.
+`apply` installs both CLI wrappers. Two timer jobs, launchd on macOS or systemd user
+timers on Linux, are installed and enabled explicitly through `umka-t3`, so reapplying
+setup never changes an existing schedule's state.
 
 ## Prerequisites
 
-- macOS with a logged-in desktop session (user LaunchAgents).
+- macOS with a logged-in desktop session (user LaunchAgents), or Linux with a
+  systemd user session. On a server, enable lingering for the user
+  (`loginctl enable-linger USER`) so the timers and T3 survive logout.
 - Node 22.3 or newer, Git, Claude Code with authentication, and **bd 1.3.1** on PATH.
   The script checks the exact bd version and never upgrades or migrates a database.
   Installing these binaries is currently a prerequisite, not automated by this script.
@@ -99,7 +102,7 @@ thread ID, original prompt and latest thread response remain there as evidence.
 The prompt binds every beads command to the isolated home. This verifies the
 agent's behavior; it is not an OS sandbox or a separate credential boundary.
 
-## Schedule deterministic checks with launchd
+## Schedule deterministic checks with launchd or systemd
 
 For the default home:
 
@@ -110,8 +113,11 @@ For the default home:
 ~/.umka/bin/umka-t3 enable
 ```
 
-`schedule-install` writes two user LaunchAgent plists under `~/Library/LaunchAgents`,
-with instance/home-specific labels. Both default to **10 seconds**:
+`schedule-install` picks the backend from the host OS. On macOS it writes two user
+LaunchAgent plists under `~/Library/LaunchAgents`. On Linux it writes a oneshot
+service and a timer per job under `~/.config/systemd/user` (or `$XDG_CONFIG_HOME`),
+then runs `systemctl --user daemon-reload`. Labels are instance/home-specific. Both
+jobs default to **10 seconds**:
 
 - `tick`: selects and launches at most one autonomous phase in a fresh T3 thread.
 - `inbox-open`: opens one conversation per ready, briefed human item that does not
@@ -119,23 +125,28 @@ with instance/home-specific labels. Both default to **10 seconds**:
 
 Neither check invokes a model when there is nothing to dispatch. There is no
 scheduler chat or shared inbox chat. Checks run directly as Node processes;
-`launchd` supplies the timer. A check may take longer than ten seconds; launchd
-does not overlap invocations of the same job. The jobs share a runtime lock,
-and briefly retry live lock contention so simultaneous timer firings can both run.
+the service manager supplies the timer. A check may take longer than ten seconds;
+neither launchd nor systemd overlaps invocations of the same job. The jobs share a
+runtime lock, and briefly retry live lock contention so simultaneous timer firings
+can both run.
 
 First installation is disabled. `enable` loads both jobs and checks immediately;
-they run again at the interval while you remain logged in. Reinstalling preserves
-the enabled intent and does not reload unchanged jobs. Use
+they run again at the interval while you remain logged in, or while lingering is
+enabled on Linux. Reinstalling preserves the enabled intent and does not reload
+unchanged jobs. Use
 `schedule-install --every-ms 10000` to select the interval explicitly. The value
 must be a positive whole number of seconds, expressed in milliseconds.
 
 `disable` persistently disables and unloads both jobs, including across login, without interrupting a T3 phase already launched.
+On Linux, `enable` and `disable` map to `systemctl --user enable --now` and `disable` plus stop;
+when run from a shell without a user bus, such as `sudo -iu`, the adapter points
+`systemctl` at `/run/user/UID` itself.
 `schedule-run` executes both checks once from the terminal, including while
 disabled. `schedule-uninstall` unloads both jobs and removes their plists and
 launchd receipt. These commands affect only this instance's jobs.
 
-The plists use the absolute Node executable and bind the instance home and project.
-Installation captures PATH because launchd does not load interactive shell profiles.
+The units use the absolute Node executable and bind the instance home and project.
+Installation captures PATH because service managers do not load interactive shell profiles.
 Reinstall after moving the checkout, changing Node installations, or changing the
 PATH needed by beads/T3 and their dependencies.
 
@@ -153,7 +164,7 @@ cat ~/.umka/t3code/inbox-open-status.json
 ```
 
 `schedule-status` reports whether each job is installed and loaded; `launchd.json`
-records configuration and enabled intent. Quiet scheduled checks write no terminal
+on macOS, or `systemd.json` on Linux, records configuration and enabled intent. Quiet scheduled checks write no terminal
 or chat messages. They do not grow an idle/error log.
 
 ### Migration from the native T3 timer
@@ -169,11 +180,12 @@ The migration alone uses T3's protocol-2 schedule API with a short-lived,
 revoked-after-use local orchestration session. Normal launchd checks use the
 existing T3 CLI, never T3's database or an agent-backed scheduler.
 
-The Mac must be awake and T3 must be running to launch/read threads. While T3 is
+The host must be awake and T3 must be running to launch/read threads. While T3 is
 unavailable, checks report failures in their status files. Read failures retry
 on later intervals; a failed launch has an uncertain outcome and requires inspection
 before dispatch resumes.
-This setup does not keep the Mac awake or provide always-on hosting.
+This setup does not keep a Mac awake; a Linux host with lingering and the T3
+service provides always-on dispatch.
 
 ## Use the per-item inbox
 

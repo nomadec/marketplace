@@ -86,11 +86,77 @@ test('failed migration prevents installation and can be retried', async t => {
   assert.equal(fs.existsSync(path.join(f.o.home, 't3code/schedule.lock')), false);
 });
 
-test('invalid intervals and non-macOS hosts fail before installation', async t => {
+test('invalid intervals and unsupported hosts fail before installation', async t => {
   const f = fixture(t);
   await assert.rejects(f.call('schedule-install', ['--every-ms', '1500']), /whole number/);
-  await assert.rejects(schedule(f.o, 'schedule-install', [], null, f.run, { platform: 'linux' }), /requires macOS/);
+  await assert.rejects(schedule(f.o, 'schedule-install', [], null, f.run, { platform: 'win32' }), /requires macOS .* or Linux/);
   assert.equal(fs.existsSync(f.o.home), false);
+});
+
+function systemdFixture(t) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'umka-systemd-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const o = { home: path.join(dir, 'umka "50%" home'), instance: 'test', project: dir, t3: '/test/t3' };
+  const host = { platform: 'linux', userHome: dir, uid: 1000 };
+  const active = new Set();
+  const enabled = new Set();
+  const calls = [];
+  const run = (exe, args, options) => {
+    calls.push({ exe, args });
+    if (exe !== 'systemctl') return '{}';
+    assert.equal(args[0], '--user');
+    assert.equal(options.env.XDG_RUNTIME_DIR, process.env.XDG_RUNTIME_DIR || '/run/user/1000');
+    const [, verb, ...rest] = args;
+    const unit = rest.at(-1);
+    if (verb === 'show') return active.has(unit) ? 'active' : 'inactive';
+    if (verb === 'daemon-reload') return '';
+    if (verb === 'start') { assert.equal(fs.existsSync(path.join(dir, '.config/systemd/user', unit)), true); active.add(unit); return ''; }
+    if (verb === 'stop') { active.delete(unit); return ''; }
+    if (verb === 'enable') { enabled.add(unit); return ''; }
+    if (verb === 'disable') { enabled.delete(unit); return ''; }
+    throw new Error(`Unexpected ${args}`);
+  };
+  const connect = async () => { throw new Error('No native API expected'); };
+  return { dir, o, host, active, enabled, calls, run, call: (action, args = []) => schedule(o, action, args, connect, run, host) };
+}
+
+test('linux hosts install two systemd user timers with the same lifecycle', async t => {
+  const f = systemdFixture(t);
+  const first = await f.call('schedule-install');
+  assert.equal(first.backend, 'systemd');
+  assert.equal(first.enabled, false);
+  assert.equal(f.active.size, 0);
+  assert.deepEqual(first.jobs.map(j => j.action), ['tick', 'inbox-open']);
+  assert.equal(f.calls.filter(c => c.args[1] === 'daemon-reload').length, 1);
+  for (const job of first.jobs) {
+    const timer = fs.readFileSync(job.file, 'utf8');
+    assert.match(timer, /OnUnitActiveSec=10s/);
+    assert.match(timer, /WantedBy=timers.target/);
+    const service = fs.readFileSync(job.service, 'utf8');
+    assert.match(service, /Type=oneshot/);
+    assert.match(service, /umka \\"50%%\\" home/);
+    assert.match(service, /--quiet/);
+    assert.match(service, /Environment="PATH=/);
+  }
+  assert.equal(fs.existsSync(path.join(f.o.home, 't3code/systemd.json')), true);
+  await f.call('enable');
+  assert.equal(f.active.size, 2);
+  assert.equal(f.enabled.size, 2);
+  const starts = f.calls.filter(c => c.args[1] === 'start').length;
+  await f.call('schedule-install');
+  assert.equal(f.active.size, 2);
+  assert.equal(f.calls.filter(c => c.args[1] === 'start').length, starts);
+  assert.equal(f.calls.filter(c => c.args[1] === 'daemon-reload').length, 1);
+  assert.equal((await f.call('schedule-status')).jobs.every(j => j.loaded), true);
+  await f.call('schedule-install', ['--every-ms', '30000']);
+  assert.equal(f.calls.filter(c => c.args[1] === 'daemon-reload').length, 2);
+  assert.match(fs.readFileSync(first.jobs[0].file, 'utf8'), /OnUnitActiveSec=30s/);
+  await f.call('disable');
+  assert.equal(f.active.size, 0);
+  assert.equal(f.enabled.size, 0);
+  await f.call('schedule-uninstall');
+  assert.equal(first.jobs.every(j => !fs.existsSync(j.file) && !fs.existsSync(j.service)), true);
+  assert.equal(fs.existsSync(path.join(f.o.home, 't3code/systemd.json')), false);
 });
 
 test('launchctl errors other than a missing service propagate', async t => {
