@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { tick, inbox, answer, openInbox, resumeInbox } from './umka-t3-runtime.mjs';
-import { withLock } from './umka-t3code.mjs';
+import { tick, inbox, answer, openInbox, resumeInbox, HISTORY_LIMIT } from './umka-t3-runtime.mjs';
+import { withLock, write } from './umka-t3code.mjs';
 
 function fixture(t) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'umka-runtime-'));
@@ -111,6 +111,41 @@ test('a phase thread that produced the brief becomes its inbox conversation', t 
   assert.equal(openInbox(f.o, f.run).items[0].threadId, 'thread-1');
   assert.equal(f.state.launches, 1);
   assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+});
+
+test('a re-briefed item opens a fresh conversation instead of reusing its settled phase thread', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint'];
+  tick(f.o, {}, f.run);
+  f.state.threadStatus = 'completed';
+  f.state.issues[1].labels.push('briefed');
+  assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+  assert.equal(inbox(f.o, f.run)[0].threadId, 'thread-1');
+  f.state.issues[1].description = 'A different brief, posted by a terminal session';
+  assert.equal(inbox(f.o, f.run)[0].threadId, null);
+  assert.equal(openInbox(f.o, f.run).items[0].threadId, 'thread-2');
+  assert.equal(f.state.launches, 2);
+});
+
+test('closed inbox conversations are dropped and the runner history stays bounded', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  openInbox(f.o, f.run);
+  const items = path.join(f.o.home, 't3code/inbox-items.json');
+  assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(items)).items), ['u-1.1']);
+  answer(f.o, 'u-1.1', 'Approved', f.run);
+  assert.equal(openInbox(f.o, f.run).status, 'empty');
+  assert.deepEqual(JSON.parse(fs.readFileSync(items)).items, {});
+  const runner = path.join(f.o.home, 't3code/runner.json');
+  write(runner, { active: null, history: Array.from({ length: HISTORY_LIMIT }, (_, i) => ({ itemId: `old-${i}`, threadId: `t-${i}`, result: 'closed' })) });
+  f.state.issues[1] = { id: 'u-1.2', parent: 'u-1', title: 'answer', status: 'open', labels: ['phase:answer'], description: 'Next' };
+  tick(f.o, {}, f.run);
+  f.state.threadStatus = 'completed'; f.state.issues[1].status = 'closed';
+  tick(f.o, {}, f.run);
+  const history = JSON.parse(fs.readFileSync(runner)).history;
+  assert.equal(history.length, HISTORY_LIMIT);
+  assert.equal(history.at(-1).itemId, 'u-1.2');
+  assert.equal(history[0].itemId, 'old-1');
 });
 
 test('uncertain inbox launches never duplicate a conversation', t => {

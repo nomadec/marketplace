@@ -1,16 +1,22 @@
+// The serial Umka runtime on local T3 Code: one managed phase thread at a time (tick),
+// one conversation thread per waiting human item (inbox), and the journals that make
+// every launch recoverable. All mutations run under the per-home runtime lock.
 import fs from 'node:fs';
 import path from 'node:path';
-import { command, root, write, shellQuote, withLock } from './umka-t3code.mjs';
+import { createHash } from 'node:crypto';
+import { command, root, write, shellQuote, withLock, t3call } from './umka-t3code.mjs';
 import { load } from '../umka/skills/run/phases.mjs';
 import { decide, modeOf } from '../umka/skills/run/pick.mjs';
 
+export { t3call };
 export const runtimeLock = (o, work) => withLock(`${o.home}:runtime`, work, () => ({ status: 'busy', reason: 'locked' }));
+// runner.json is read and rewritten on every check; keep only the recent turns needed for recovery.
+export const HISTORY_LIMIT = 100;
 
 export function options(home) {
   const receipt = JSON.parse(fs.readFileSync(path.join(home, 't3code/setup.json'), 'utf8'));
   return { ...receipt, home, t3Home: receipt.t3Home || undefined };
 }
-export const t3call = (o, run, args) => run(o.t3, [...args, ...(o.t3Home ? ['--base-dir', o.t3Home] : [])]);
 export function readQueue(o, run = command) {
   const { phases, errors } = load(path.join(root, 'umka/skills/run/phases'));
   if (errors.length) throw new Error(errors.join('\n'));
@@ -20,6 +26,20 @@ export function readQueue(o, run = command) {
 export function journal(o) {
   const file = path.join(o.home, 't3code/runner.json');
   return { file, data: fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { active: null, history: [] } };
+}
+function settle(j, entry) {
+  j.data.history = [...j.data.history, entry].slice(-HISTORY_LIMIT);
+  j.data.active = null;
+  write(j.file, j.data);
+}
+const digest = text => createHash('sha256').update(text || '').digest('hex');
+// The thread a waiting item's human should reply in: its own inbox conversation, the phase
+// thread currently working on it, or the settled phase thread that posted this exact brief.
+// A re-briefed item (changed description) gets a fresh conversation instead of a stale thread.
+function conversation(j, saved, item) {
+  if (saved[item.id]) return saved[item.id];
+  if (j.active?.itemId === item.id) return j.active;
+  return j.history.findLast(h => h.itemId === item.id && h.brief === digest(item.description));
 }
 export function homeInstructions(o) {
   return `The Umka instance home is ${JSON.stringify(o.home)}. In every shell invocation set UMKA_HOME=${shellQuote(o.home)} and in every beads command use bd -C ${shellQuote(o.home)}. Use this home exclusively, never an implicit default.`;
@@ -44,9 +64,7 @@ export function settleActive(o, j, run) {
       const reproduced = classification?.[1] !== 'bug' || issues.some(i => i.parent === id && i.labels?.includes('phase:reproduce'));
       if (!classification || !topic || !reproduced) throw new Error(`T3 intake ${a.threadId} did not finish classifying ${id}; inspect it before retrying`);
     }
-    j.data.history.push({ kind: 'intake', intakeBatchId: a.intakeBatchId, epicIds: a.epicIds, threadId: a.threadId, result: 'classified' });
-    j.data.active = null;
-    write(j.file, j.data);
+    settle(j, { kind: 'intake', intakeBatchId: a.intakeBatchId, epicIds: a.epicIds, threadId: a.threadId, result: 'classified' });
     return;
   }
   const after = issues.find(i => i.id === a.itemId);
@@ -54,9 +72,7 @@ export function settleActive(o, j, run) {
   // A human may ask a question before claiming the phase. Release that reservation.
   const awaitingReply = a.human && after?.status === 'open';
   if ((!awaitingReply && !progressed(a.before, after)) || after?.status === 'in_progress') throw new Error(`T3 turn ${a.threadId} did not finish ${a.itemId}; inspect it before retrying`);
-  j.data.history.push({ itemId: a.itemId, threadId: a.threadId, result: after.status });
-  j.data.active = null;
-  write(j.file, j.data);
+  settle(j, { itemId: a.itemId, threadId: a.threadId, result: after.status, brief: digest(after.description) });
 }
 
 export function tick(o, { dry = false, attendedId } = {}, run = command) {
@@ -91,12 +107,12 @@ export function tick(o, { dry = false, attendedId } = {}, run = command) {
 }
 
 export function inbox(o, run = command) {
-  const q = readQueue(o, run);
-  const j = journal(o).data;
-  const conversations = inboxJournal(o).data.items;
+  return waitingItems(readQueue(o, run), journal(o).data, inboxJournal(o).data.items);
+}
+function waitingItems(q, j, conversations) {
   return q.decision.waiting.map(w => {
     const item = q.issues.find(i => i.id === w.id);
-    const record = conversations[w.id] || (j.active?.itemId === w.id ? j.active : j.history.findLast(h => h.itemId === w.id));
+    const record = conversation(j, conversations, item);
     return { ...w, description: item.description, mode: modeOf(item, q.phases), interactive: modeOf(item, q.phases) === 'hitl' && !/\*\*Apply\*\*/.test(q.phases[w.phase].body), threadId: record?.threadId || null };
   });
 }
@@ -124,9 +140,13 @@ function inboxJournal(o) {
 
 export function openInbox(o, run = command) {
   return runtimeLock(o, () => {
-    const waiting = inbox(o, run);
-    if (!waiting.length) return { status: 'empty', items: [] };
+    const q = readQueue(o, run);
     const saved = inboxJournal(o);
+    const waiting = waitingItems(q, journal(o).data, saved.data.items);
+    // Conversations of closed items are over; drop them so this file stays bounded.
+    const closed = Object.keys(saved.data.items).filter(id => !saved.data.items[id].launching && q.issues.find(i => i.id === id)?.status === 'closed');
+    if (closed.length) { for (const id of closed) delete saved.data.items[id]; write(saved.file, saved.data); }
+    if (!waiting.length) return { status: 'empty', items: [] };
     const results = [];
     for (const item of waiting) {
       let record = saved.data.items[item.id];
@@ -156,10 +176,10 @@ export function openInbox(o, run = command) {
 
 export function resumeInbox(o, id, run = command) {
   return runtimeLock(o, () => {
-    const history = journal(o).data;
-    const record = inboxJournal(o).data.items[id] || (history.active?.itemId === id ? history.active : history.history.findLast(h => h.itemId === id));
-    if (!record?.threadId) throw new Error(`No inbox thread is recorded for ${id}`);
     const j = journal(o);
+    const current = readQueue(o, run).issues.find(i => i.id === id);
+    const record = current && conversation(j.data, inboxJournal(o).data.items, current);
+    if (!record?.threadId) throw new Error(`No inbox thread is recorded for ${id}`);
     if (j.data.active?.human && j.data.active.itemId === id && j.data.active.threadId === record.threadId) {
       const item = readQueue(o, run).issues.find(i => i.id === id);
       if (!item || !['open', 'in_progress'].includes(item.status)) throw new Error(`${id} is no longer open; re-read the item`);

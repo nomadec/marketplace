@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { command, root, write, shellQuote, withLock } from './umka-t3code.mjs';
+import { command, root, write, shellQuote, withLock, t3call } from './umka-t3code.mjs';
 
 // A real AFK phase, with no code changes, remote tracker, or live queue involved.
 // Persist the fixture and launch intent before starting a thread. An uncertain
@@ -14,7 +14,7 @@ function runSmoke(o, folder, run, log) {
   const home = path.join(folder, 'home');
   const statePath = path.join(folder, 'state.json');
   const state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) : {};
-  const t3 = args => run(o.t3, [...args, ...(o.t3Home ? ['--base-dir', o.t3Home] : [])]);
+  const t3 = args => t3call(o, run, args);
   const bd = args => run('bd', ['-C', home, ...args]);
   if (!state.threadId && o.mode === 'smoke-status') throw new Error('No smoke thread is recorded. Run smoke first.');
   if (state.launching && !state.threadId) throw new Error(`The previous launch has an uncertain outcome. Inspect T3 threads and ${statePath}; do not launch a duplicate.`);

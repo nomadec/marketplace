@@ -16,13 +16,14 @@ function fixture(t) {
   const item = { id: 'request-1', title: 'A synthetic question', text: 'How does the synthetic example work?', who: 'test', created: '2026-10-26T00:00:00Z' };
   feed([item]);
   write(path.join(home, 'sources.json'), { sources: [{ name: 'test-feed', kind: 'file', path: source, repo_key: 'example' }] });
-  const state = { issues: [], calls: [], launches: 0, threadStatus: 'running', failLaunch: false, loseCreate: false, failNote: false };
+  const state = { issues: [], calls: [], launches: 0, threadStatus: 'running', failLaunch: false, loseCreate: false, failCreate: false, failNote: false };
   const run = (exe, args) => {
     state.calls.push({ exe, args });
     if (exe === 'bd') {
       if (args[2] === 'list') return JSON.stringify(state.issues);
       if (args[2] === 'create') {
-        const epic = { id: `u-${state.issues.length + 1}`, title: args[3], status: 'open', issue_type: 'epic', labels: ['loop'], external_ref: args[args.indexOf('--external-ref') + 1], description: args[args.indexOf('-d') + 1] };
+        if (state.failCreate) throw new Error('Create failed');
+        const epic = { id: `u-${state.issues.length + 1}`, title: args[args.indexOf('--') + 1], status: 'open', issue_type: 'epic', labels: ['loop'], external_ref: args[args.indexOf('--external-ref') + 1], description: args[args.indexOf('-d') + 1] };
         state.issues.push(epic);
         if (state.loseCreate) throw new Error('Lost create response');
         return JSON.stringify(epic);
@@ -122,6 +123,28 @@ test('a lost beads create response is reconciled by external ref, without a dupl
   assert.equal(f.call().status, 'started');
   assert.equal(f.state.issues.length, 1);
   assert.equal(f.state.launches, 1);
+});
+
+test('a failed beads create is retried on the next intake instead of wedging the batch', t => {
+  const f = fixture(t);
+  f.state.failCreate = true;
+  assert.throws(() => f.call(), /Create failed/);
+  assert.throws(() => f.call(), /Create failed/);
+  assert.equal(f.state.issues.length, 0);
+  f.state.failCreate = false;
+  assert.equal(f.call().status, 'started');
+  assert.equal(f.state.issues.length, 1);
+  assert.equal(f.state.launches, 1);
+});
+
+test('an untrusted title that looks like a flag is passed to bd after a -- terminator', t => {
+  const f = fixture(t);
+  f.feed([{ ...f.item, title: '--help me' }]);
+  f.call();
+  const create = f.state.calls.find(c => c.exe === 'bd' && c.args[2] === 'create');
+  assert.equal(create.args.at(-2), '--');
+  assert.equal(create.args.at(-1), '--help me');
+  assert.equal(f.state.issues[0].title, '--help me');
 });
 
 test('partially imported batches resume and repair notes before advancing cursors', t => {

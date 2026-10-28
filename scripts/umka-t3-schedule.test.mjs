@@ -45,6 +45,8 @@ test('install produces two 10-second jobs without model turns; enable/reinstall/
     assert.match(contents, /umka &amp; home/);
     assert.match(contents, /--quiet/);
     assert.match(contents, /<key>PATH<\/key>/);
+    assert.match(contents, /<key>RunAtLoad<\/key><true\/>/);
+    assert.match(contents, /<key>Disabled<\/key><true\/>/);
   }
   await f.call('enable');
   assert.equal(f.loaded.size, 2);
@@ -59,6 +61,33 @@ test('install produces two 10-second jobs without model turns; enable/reinstall/
   assert.equal(f.loaded.size, 0);
   await f.call('schedule-uninstall');
   assert.equal(first.jobs.every(j => !fs.existsSync(j.file)), true);
+});
+
+test('uninstall disables the jobs so no enable override survives the unit files', async t => {
+  const f = fixture(t);
+  await f.call('schedule-install');
+  await f.call('enable');
+  assert.equal(f.disabled.size, 0);
+  await f.call('schedule-uninstall');
+  assert.equal(f.disabled.size, 2);
+  assert.equal(f.loaded.size, 0);
+  const g = systemdFixture(t);
+  await g.call('schedule-install');
+  await g.call('enable');
+  await g.call('schedule-uninstall');
+  assert.equal(g.enabled.size, 0);
+  assert.equal(g.active.size, 0);
+});
+
+test('migration refuses to continue when the recorded native timer cannot be found', async t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.o.home, 't3code'), { recursive: true });
+  const file = path.join(f.o.home, 't3code/schedule.json');
+  fs.writeFileSync(file, JSON.stringify({ scheduledTaskId: 'elsewhere' }));
+  const connect = async (_o, action) => action({ rpc: async () => ({ tasks: [{ id: 'other', enabled: true }] }) });
+  await assert.rejects(f.call('schedule-install', [], connect), /elsewhere is not in this T3 base dir/);
+  assert.equal(JSON.parse(fs.readFileSync(file)).disabledForLaunchd, undefined);
+  assert.equal(fs.existsSync(path.join(f.dir, 'Library/LaunchAgents')), false);
 });
 
 test('migration disables only the recorded native timer before installing launchd jobs', async t => {
@@ -83,7 +112,22 @@ test('failed migration prevents installation and can be retried', async t => {
   fs.writeFileSync(path.join(f.o.home, 't3code/schedule.json'), JSON.stringify({ scheduledTaskId: 'old' }));
   await assert.rejects(f.call('schedule-install'), /No native API expected/);
   assert.equal(fs.existsSync(path.join(f.dir, 'Library/LaunchAgents')), false);
-  assert.equal(fs.existsSync(path.join(f.o.home, 't3code/schedule.lock')), false);
+  const connect = async (_o, action) => action({ rpc: async () => ({ tasks: [{ id: 'old', enabled: false }] }) });
+  assert.equal((await f.call('schedule-install', [], connect)).enabled, false);
+});
+
+test('the schedule lock is held across the async migration, so a concurrent command fails fast', async t => {
+  const f = fixture(t);
+  fs.mkdirSync(path.join(f.o.home, 't3code'), { recursive: true });
+  fs.writeFileSync(path.join(f.o.home, 't3code/schedule.json'), JSON.stringify({ scheduledTaskId: 'old' }));
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const held = f.call('schedule-install', [], async (_o, action) => { await gate; return action({ rpc: async () => ({ tasks: [{ id: 'old', enabled: false }] }) }); });
+  await new Promise(resolve => setImmediate(resolve));
+  await assert.rejects(f.call('schedule-install'), /Another setup operation/);
+  release();
+  assert.equal((await held).enabled, false);
+  assert.equal((await f.call('disable')).enabled, false);
 });
 
 test('invalid intervals and unsupported hosts fail before installation', async t => {

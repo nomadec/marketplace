@@ -1,3 +1,5 @@
+// Manual intake: poll the configured sources, import new items as beads epics keyed by
+// external ref, then start one fresh T3 thread that classifies the whole batch.
 import fs from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -87,17 +89,15 @@ export function intake(o, { dry = false } = {}, run = command) {
       let epic = byLink.get(entry.item.link);
       if (entry.epicId && epic?.id !== entry.epicId) throw new Error(`Imported epic ${entry.epicId} is missing; inspect intake.json`);
       if (!epic) {
-        if (entry.creating) throw new Error(`Import outcome for ${entry.item.link} is uncertain; inspect beads and intake.json before retrying`);
-        entry.creating = true;
-        write(file, { pending: batch });
+        // No epic carries this external ref, so a create that failed or lost its response is safe to retry.
+        // The title is untrusted and may start with `-`; `--` keeps bd from reading it as flags.
         const labels = entry.item.labels?.length ? `\nSource labels: ${entry.item.labels.join(', ')}` : '';
-        epic = JSON.parse(run('bd', ['-C', o.home, 'create', entry.item.title, '--type', 'epic', '-l', 'loop', '--external-ref', entry.item.link,
-          '-d', `${entry.item.text || ''}\n\nSent by ${entry.item.who || 'unknown'} (${entry.source.name}).${labels}`, '--json']));
+        epic = JSON.parse(run('bd', ['-C', o.home, 'create', '--type', 'epic', '-l', 'loop', '--external-ref', entry.item.link,
+          '-d', `${entry.item.text || ''}\n\nSent by ${entry.item.who || 'unknown'} (${entry.source.name}).${labels}`, '--json', '--', entry.item.title]));
         if (!epic.id) throw new Error('Beads returned no epic id; inspect the import outcome');
         byLink.set(entry.item.link, epic);
       }
       entry.epicId = epic.id;
-      entry.creating = false;
       write(file, { pending: batch });
       for (const note of ['channel: cli', ...(entry.source.repoKey ? [`repo: ${entry.source.repoKey}`] : [])]) {
         if (!(epic.notes || '').split('\n').includes(note)) run('bd', ['-C', o.home, 'note', epic.id, note]);

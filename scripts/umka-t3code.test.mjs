@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { setup, root, parse, digest, withLock } from './umka-t3code.mjs';
 import { smoke } from './umka-t3code-smoke.mjs';
 
@@ -151,6 +152,14 @@ test('concurrent setup cannot enter the same home and failures release the lock'
   withLock(f.home, () => assert.throws(f.apply, /Another setup operation/));
   assert.throws(() => withLock(f.home, () => { throw new Error('interrupted'); }), /interrupted/);
   f.apply();
+});
+
+test('a lock whose owner has not yet recorded its PID reads as busy, not as a crash', t => {
+  const lock = path.join(os.tmpdir(), `umka-t3code-${createHash('sha256').update('pidless').digest('hex').slice(0, 24)}.lock`);
+  fs.mkdirSync(lock);
+  t.after(() => fs.rmSync(lock, { recursive: true, force: true }));
+  assert.equal(withLock('pidless', () => 'ran', () => 'busy'), 'busy');
+  assert.throws(() => withLock('pidless', () => 'ran'), /Another setup operation/);
 });
 
 test('smoke retries reuse the recorded thread and an uncertain launch never duplicates work', t => {

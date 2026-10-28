@@ -142,8 +142,8 @@ On Linux, `enable` and `disable` map to `systemctl --user enable --now` and `dis
 when run from a shell without a user bus, such as `sudo -iu`, the adapter points
 `systemctl` at `/run/user/UID` itself.
 `schedule-run` executes both checks once from the terminal, including while
-disabled. `schedule-uninstall` unloads both jobs and removes their plists and
-launchd receipt. These commands affect only this instance's jobs.
+disabled. `schedule-uninstall` disables and unloads both jobs and removes their
+unit files and receipt. These commands affect only this instance's jobs.
 
 The units use the absolute Node executable and bind the instance home and project.
 Installation captures PATH because service managers do not load interactive shell profiles.
@@ -170,8 +170,10 @@ or chat messages. They do not grow an idle/error log.
 ### Migration from the native T3 timer
 
 On an existing installation, `schedule-install` disables the native timer recorded
-in `t3code/schedule.json` before writing the new jobs. If T3 is unavailable or that
-operation fails, installation stops. It leaves unrelated schedules alone. An
+in `t3code/schedule.json` before writing the new jobs. If T3 is unavailable, that
+operation fails, or the recorded task is not found in this T3 base dir, installation
+stops; disable the task where it lives, then delete `t3code/schedule.json` to
+continue. It leaves unrelated schedules alone. An
 already-running native scheduler turn is not cancelled; shared dispatch locking
 still prevents duplicate work. Old scheduler and shared inbox chats remain as
 history; the new jobs never refresh or append to them.

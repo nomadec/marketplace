@@ -3,17 +3,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { command } from './umka-t3code.mjs';
+import { command, t3call } from './umka-t3code.mjs';
 
-const methods = new Set(['scheduledTasks.list', 'scheduledTasks.upsert', 'scheduledTasks.setEnabled', 'scheduledTasks.runNow', 'scheduledTasks.delete']);
+// Only what the launchd/systemd migration needs: find the old native timer and switch it off.
+const methods = new Set(['scheduledTasks.list', 'scheduledTasks.setEnabled']);
 
 export async function withT3Api(o, action) {
   const base = o.t3Home || process.env.T3CODE_HOME || path.join(os.homedir(), '.t3');
-  const location = o.t3Home ? ['--base-dir', o.t3Home] : [];
   const origin = new URL(JSON.parse(fs.readFileSync(path.join(base, 'userdata/server-runtime.json'), 'utf8')).origin);
   if (!['127.0.0.1', 'localhost', '[::1]'].includes(origin.hostname)) throw new Error('This setup adapter only connects to a local T3 server');
   // Keep the token in memory. Do not include it in logs, files, or error messages.
-  const auth = JSON.parse(command(o.t3, ['auth', 'session', 'issue', '--scope', 'orchestration:read', '--scope', 'orchestration:operate', '--ttl', '5m', '--label', 'Umka setup', '--json', ...location]));
+  const auth = JSON.parse(t3call(o, command, ['auth', 'session', 'issue', '--scope', 'orchestration:read', '--scope', 'orchestration:operate', '--ttl', '5m', '--label', 'Umka setup', '--json']));
   let ws;
   const pending = new Map();
   try {
@@ -59,10 +59,10 @@ export async function withT3Api(o, action) {
         ws.send(JSON.stringify({ _tag: 'Request', id, tag: method, payload, headers: [] }));
       });
     };
-    return await action({ rpc, projects: () => http('/api/projects') });
+    return await action({ rpc });
   } finally {
     for (const p of pending.values()) clearTimeout(p.timer);
     ws?.close();
-    command(o.t3, ['auth', 'session', 'revoke', auth.sessionId, ...location]);
+    t3call(o, command, ['auth', 'session', 'revoke', auth.sessionId]);
   }
 }

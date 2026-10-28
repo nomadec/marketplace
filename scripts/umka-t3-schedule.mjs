@@ -1,8 +1,10 @@
+// Recurring tick and inbox checks as launchd agents (macOS) or systemd user timers (Linux).
+// Install writes the unit files disabled; enable/disable flip them and persist across login.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { command, root, write } from './umka-t3code.mjs';
+import { command, root, write, withLock } from './umka-t3code.mjs';
 import { withT3Api } from './t3-api.mjs';
 
 // Retain the old ID solely to disable an installed native, agent-backed timer.
@@ -11,15 +13,15 @@ export function scheduleId(o) {
 }
 const checkArgs = (o, job) => [path.join(root, 'scripts/umka-t3'), o.home, job.action, '--quiet'];
 
-const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
+const xml = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
 export function plist(job, o, everyMs, envPath = process.env.PATH || '/usr/bin:/bin', node = process.execPath) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>Label</key><string>${escape(job.label)}</string>
-<key>ProgramArguments</key><array>${[node, ...checkArgs(o, job)].map(a => `<string>${escape(a)}</string>`).join('')}</array>
-<key>WorkingDirectory</key><string>${escape(o.project)}</string>
-<key>EnvironmentVariables</key><dict><key>PATH</key><string>${escape(envPath)}</string><key>UMKA_HOME</key><string>${escape(o.home)}</string></dict>
+<key>Label</key><string>${xml(job.label)}</string>
+<key>ProgramArguments</key><array>${[node, ...checkArgs(o, job)].map(a => `<string>${xml(a)}</string>`).join('')}</array>
+<key>WorkingDirectory</key><string>${xml(o.project)}</string>
+<key>EnvironmentVariables</key><dict><key>PATH</key><string>${xml(envPath)}</string><key>UMKA_HOME</key><string>${xml(o.home)}</string></dict>
 <key>StartInterval</key><integer>${everyMs / 1000}</integer>
 <key>RunAtLoad</key><true/>
 <key>Disabled</key><true/>
@@ -145,12 +147,9 @@ export async function schedule(o, action, args = [], connect = withT3Api, run = 
     const state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) : null;
     return { backend: b.name, everyMs: state?.everyMs ?? null, jobs: jobs.map(job => ({ ...job, installed: fs.existsSync(job.file), loaded: b.loaded(job) })) };
   }
-  // The filesystem lock spans async API migration as well as service manager mutations.
-  const lock = path.join(folder, 'schedule.lock');
-  fs.mkdirSync(folder, { recursive: true });
-  try { fs.mkdirSync(lock); } catch (e) { if (e.code !== 'EEXIST') throw e; throw new Error(`Schedule management active or interrupted; inspect ${lock}`); }
-  try {
-    fs.writeFileSync(path.join(lock, 'pid'), String(process.pid));
+  // The lock spans async API migration as well as service manager mutations.
+  return withLock(`${o.home}:schedule`, async () => {
+    fs.mkdirSync(folder, { recursive: true });
     let state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, 'utf8')) : null;
     if (action === 'schedule-install') {
       // Disable the old timer before any new dispatcher can run. Failure stops migration.
@@ -161,7 +160,8 @@ export async function schedule(o, action, args = [], connect = withT3Api, run = 
           await connect(o, async api => {
             const { tasks } = await api.rpc('scheduledTasks.list');
             const old = tasks.find(t => t.id === legacy.scheduledTaskId);
-            if (old?.enabled) await api.rpc('scheduledTasks.setEnabled', { id: old.id, enabled: false });
+            if (!old) throw new Error(`Recorded T3 scheduled task ${legacy.scheduledTaskId} is not in this T3 base dir. Disable it where it lives, then delete ${legacyPath} to continue.`);
+            if (old.enabled) await api.rpc('scheduledTasks.setEnabled', { id: old.id, enabled: false });
           });
           write(legacyPath, { ...legacy, disabledForLaunchd: true });
         }
@@ -183,7 +183,8 @@ export async function schedule(o, action, args = [], connect = withT3Api, run = 
     }
     if (!state) throw new Error('Run schedule-install first');
     if (action === 'schedule-uninstall') {
-      for (const job of jobs) { b.unload(job); b.remove(job); }
+      // Disable as well as unload, so no enable override outlives the unit files.
+      for (const job of jobs) { b.disable(job); b.remove(job); }
       b.reload();
       fs.rmSync(statePath);
       return { status: 'uninstalled' };
@@ -198,5 +199,5 @@ export async function schedule(o, action, args = [], connect = withT3Api, run = 
     write(statePath, state);
     for (const job of jobs) state.enabled ? b.load(job) : b.disable(job);
     return state;
-  } finally { fs.rmSync(lock, { recursive: true }); }
+  });
 }
