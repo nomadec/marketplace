@@ -143,9 +143,9 @@ export function openInbox(o, run = command) {
     const q = readQueue(o, run);
     const saved = inboxJournal(o);
     const waiting = waitingItems(q, journal(o).data, saved.data.items);
-    // Conversations of closed items are over; drop them so this file stays bounded.
-    const closed = Object.keys(saved.data.items).filter(id => !saved.data.items[id].launching && q.issues.find(i => i.id === id)?.status === 'closed');
-    if (closed.length) { for (const id of closed) delete saved.data.items[id]; write(saved.file, saved.data); }
+    // Conversations of closed or deleted items are over; drop them so this file stays bounded.
+    const gone = Object.keys(saved.data.items).filter(id => !saved.data.items[id].launching && (q.issues.find(i => i.id === id)?.status ?? 'closed') === 'closed');
+    if (gone.length) { for (const id of gone) delete saved.data.items[id]; write(saved.file, saved.data); }
     if (!waiting.length) return { status: 'empty', items: [] };
     const results = [];
     for (const item of waiting) {

@@ -32,8 +32,10 @@ export function plist(job, o, everyMs, envPath = process.env.PATH || '/usr/bin:/
 `;
 }
 
-// systemd unit quoting: double quotes with backslash escapes; % is a specifier.
+// systemd unit quoting for word-split settings (ExecStart, Environment): double quotes with backslash escapes; % is a specifier.
 const quote = value => `"${String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll('%', '%%')}"`;
+// WorkingDirectory is a single path, not word-split: quotes would become part of it. Only specifiers need escaping.
+const unitPath = value => String(value).replaceAll('%', '%%');
 export function systemdUnits(job, o, everyMs, envPath = process.env.PATH || '/usr/bin:/bin', node = process.execPath) {
   const service = `[Unit]
 Description=Umka ${o.instance} ${job.action} check
@@ -41,7 +43,7 @@ Description=Umka ${o.instance} ${job.action} check
 [Service]
 Type=oneshot
 ExecStart=${[node, ...checkArgs(o, job)].map(quote).join(' ')}
-WorkingDirectory=${quote(o.project)}
+WorkingDirectory=${unitPath(o.project)}
 Environment=${quote(`PATH=${envPath}`)} ${quote(`UMKA_HOME=${o.home}`)}
 UMask=0077
 StandardOutput=null

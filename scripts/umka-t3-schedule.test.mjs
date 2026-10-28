@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import os from 'node:os';
 import { schedule } from './umka-t3-schedule.mjs';
@@ -164,6 +165,17 @@ function systemdFixture(t) {
   return { dir, o, host, active, enabled, calls, run, call: (action, args = []) => schedule(o, action, args, connect, run, host) };
 }
 
+// Lets a real systemd parse the generated units when the host has one; the fixture only mocks systemctl.
+function verifyUnits(jobs) {
+  const analyze = spawnSync('systemd-analyze', ['--version'], { stdio: 'ignore' });
+  if (analyze.error || analyze.status !== 0) return;
+  for (const job of jobs) {
+    const r = spawnSync('systemd-analyze', ['--user', 'verify', job.service, job.file], { encoding: 'utf8' });
+    assert.equal(r.status, 0, `${job.label}: ${r.stderr}`);
+    assert.doesNotMatch(r.stderr, /fatal error|not absolute/);
+  }
+}
+
 test('linux hosts install two systemd user timers with the same lifecycle', async t => {
   const f = systemdFixture(t);
   const first = await f.call('schedule-install');
@@ -181,7 +193,10 @@ test('linux hosts install two systemd user timers with the same lifecycle', asyn
     assert.match(service, /umka \\"50%%\\" home/);
     assert.match(service, /--quiet/);
     assert.match(service, /Environment="PATH=/);
+    // WorkingDirectory is not word-split, so it must be unquoted or systemd rejects the unit.
+    assert.equal(service.split('\n').find(l => l.startsWith('WorkingDirectory=')), `WorkingDirectory=${f.dir}`);
   }
+  verifyUnits(first.jobs);
   assert.equal(fs.existsSync(path.join(f.o.home, 't3code/systemd.json')), true);
   await f.call('enable');
   assert.equal(f.active.size, 2);

@@ -148,6 +148,17 @@ test('closed inbox conversations are dropped and the runner history stays bounde
   assert.equal(history[0].itemId, 'old-1');
 });
 
+test('conversations of items deleted from beads are dropped from the inbox journal', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  openInbox(f.o, f.run);
+  const items = path.join(f.o.home, 't3code/inbox-items.json');
+  assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(items)).items), ['u-1.1']);
+  f.state.issues.splice(1, 1);
+  assert.equal(openInbox(f.o, f.run).status, 'empty');
+  assert.deepEqual(JSON.parse(fs.readFileSync(items)).items, {});
+});
+
 test('uncertain inbox launches never duplicate a conversation', t => {
   const f = fixture(t);
   f.state.issues[1].labels = ['phase:grill', 'briefed'];
