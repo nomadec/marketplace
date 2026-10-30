@@ -229,10 +229,12 @@ Intake reads this instance's `sources.json` and `cursors.json`. It supports GitH
 issue sources (`kind: github`, `repo: owner/repo`) and JSON Lines file sources
 (`kind: file`, absolute `path`). Each source needs a unique `name`; optional
 `repo_key` names its checkout in `repos.json`. GitHub polling requires authenticated
-`gh` and reads up to 200 issues per invocation in creation order. File entries
-need `id` and `title`; `text`, `who`, and `created` provide the brief's details.
-With no cursor, intake considers existing source history as well as recent items;
-use the dry run to inspect the initial import.
+`gh` and reads up to 200 open issues per invocation in creation order; closed
+issues are never imported. File entries need `id` and `title`; `text`, `who`, and
+`created` provide the brief's details. With no cursor, intake considers every open
+issue, however old; use the dry run to inspect the initial import, or seed the
+source's cursor in `cursors.json` with the newest issue's number and `createdAt`
+(`{"id": "41", "created": "2026-10-21T04:49:20Z"}`) to take only later issues.
 
 When new items exist, intake creates one beads epic per external reference and
 starts one fresh T3 thread for the batch, invoking `umka:run intake IDS afk`.
