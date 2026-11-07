@@ -1,5 +1,5 @@
 ---
-name: vend_one
+name: vend-one
 description: A vendored fixture skill.
 ---
-# vend_one
+# vend-one

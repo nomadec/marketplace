@@ -1,7 +1,7 @@
 ---
 phase: work
 mode: afk
-skill: umka:vend_one
+skill: umka:vend-one
 from: [intake, approve]
 to:
   - phase: approve

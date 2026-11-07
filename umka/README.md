@@ -8,7 +8,7 @@ phases and stops. Checkpoints are closed by a human. The plugin holds three laye
 
 | Layer | Folder | What it is |
 | --- | --- | --- |
-| Skills | `skills/` | The library. Every skill is callable as `umka:<name>`. Unprefixed names are Umka's own; `vendor/<author>_<name>` are forks of third-party skills, adapted to run inside a phase, with their origin in the frontmatter and `NOTICE.md`. |
+| Skills | `skills/` | The library. Every skill is callable as `umka:<name>`. Unprefixed names are Umka's own; `vendor/<author>-<name>` are forks of third-party skills, adapted to run inside a phase, with their origin in the frontmatter and `NOTICE.md`. |
 | Phases | `phases/` | The assembly. One file per phase: its mode, the skill it runs, where it comes from, where it goes, the artifact it must leave. `phases/registry` lints it, draws it and lists every journey. |
 | Runtimes | `runtimes/` | What starts a turn without a human typing. `terminal/` runs `claude` from a timer; `t3code/` runs T3 Code threads. Both share `lib/`. |
 
@@ -19,7 +19,7 @@ task it started still runs.
 
 ## Skills
 
-Prefix means provenance. `umka:explore` is Umka's own. `umka:mattpocock_to-spec` is a
+Prefix means provenance. `umka:explore` is Umka's own. `umka:mattpocock-to-spec` is a
 fork of `mattpocock-skills:to-spec`. A fork keeps the upstream voice and records
 `origin:` (upstream id, repo, version, commit, license, whether it was adapted). The
 forks exist so that an unattended phase can invoke them through the Skill tool and so
@@ -74,7 +74,7 @@ umka/
 │   ├── run/                  the loop entry
 │   ├── findings/
 │   ├── explore/ intake/ answer/ qa-plan/ reproduce/ fix/ addressing-pr-comments/
-│   └── vendor/mattpocock_*/  forks of mattpocock-skills
+│   └── vendor/mattpocock-*/  forks of mattpocock-skills
 ├── phases/                   one file per phase, registry, tests and fixtures
 ├── lib/                      phases.mjs (the loader), pick.mjs (the pick)
 ├── runtimes/

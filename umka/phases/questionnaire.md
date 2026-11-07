@@ -1,7 +1,7 @@
 ---
 phase: questionnaire
 mode: afk
-skill: umka:mattpocock_to-questionnaire
+skill: umka:mattpocock-to-questionnaire
 from: [explore]
 to:
   - phase: answers-in
@@ -12,7 +12,7 @@ budget: 50k
 
 **Input:** the question in this item's brief and who holds the knowledge.
 
-**Run:** `/umka:mattpocock_to-questionnaire` on the brief, then commit the file on the branch and post its path to the channel.
+**Run:** `/umka:mattpocock-to-questionnaire` on the brief, then commit the file on the branch and post its path to the channel.
 
 **Done when:** the file exists and its path is posted.
 

@@ -1,5 +1,5 @@
 ---
-name: mattpocock_to-spec
+name: mattpocock-to-spec
 description: "Turn a proposal brief into a spec and publish it to the project issue tracker labelled ready-for-agent, with no interview: the brief is the conversation. Umka phase variant of mattpocock-skills:to-spec, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:to-spec

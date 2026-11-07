@@ -1,5 +1,5 @@
 ---
-name: mattpocock_implement
+name: mattpocock-implement
 description: "Implement one ticket on the unit's branch test-first, run the review, and commit, with every input taken from the ticket and the spec and nothing asked mid-run. Umka phase variant of mattpocock-skills:implement, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:implement
@@ -54,7 +54,7 @@ Run typechecking regularly and single test files regularly during the loop. Run 
 
 ## Review
 
-Call the Skill tool with `umka:mattpocock_code-review`, with the sha recorded under Inputs as the fixed point. Fix every finding it reports, re-run the affected tests and the typecheck, and commit the fixes to the current branch. A finding that needs a product decision cannot be taken here: leave the code as it is and list the finding in the output under open questions.
+Call the Skill tool with `umka:mattpocock-code-review`, with the sha recorded under Inputs as the fixed point. Fix every finding it reports, re-run the affected tests and the typecheck, and commit the fixes to the current branch. A finding that needs a product decision cannot be taken here: leave the code as it is and list the finding in the output under open questions.
 
 ## Output
 

@@ -69,7 +69,7 @@ function lint(dir, skillsDir = path.join(dir, "..", "skills")) {
     if (p.call?.kind === "skill") {
       const { name } = p.call;
       const file = skillFile(skillsDir, name);
-      if (!SKILL_NAME.test(name)) err(`skill: "${name}" is not ${SKILL_NAME}`);
+      if (!SKILL_NAME.test(name)) err(`skill: "${name}" is not a skill name: 1-64 of a-z, 0-9 and -, with no leading, trailing or double hyphen`);
       else if (!file) err(`skill: "${name}" has no SKILL.md under ${skillsDir}`);
       else if (/^disable-model-invocation:\s*true\s*$/m.test((/^---\n([\s\S]*?)\n---/.exec(fs.readFileSync(file, "utf8")) || [])[1] || "")) err(`skill: "${name}" sets disable-model-invocation, so the model cannot call it`);
     }

@@ -1,5 +1,5 @@
 ---
-name: mattpocock_to-questionnaire
+name: mattpocock-to-questionnaire
 description: "Turn a question the agent cannot answer alone into a Markdown questionnaire for the person who holds the knowledge, with the recipient and the needed answers taken from the brief. Umka phase variant of mattpocock-skills:to-questionnaire, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:to-questionnaire

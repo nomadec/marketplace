@@ -1,5 +1,5 @@
 ---
-name: mattpocock_prototype
+name: mattpocock-prototype
 description: "Build a throwaway prototype on a throwaway branch to answer the design question in the phase brief, with the human in the session reacting to it and giving the verdict. Umka phase variant of mattpocock-skills:prototype, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:prototype

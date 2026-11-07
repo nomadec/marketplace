@@ -1,5 +1,5 @@
 ---
-name: mattpocock_pr
+name: mattpocock-pr
 description: "Write the body of the pull request for the unit's branch from the branch's diff and the spec it implements, as Summary, Evidence and Merge Danger, with no question asked mid-run. Umka phase variant of mattpocock-skills:pr, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:pr

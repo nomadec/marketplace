@@ -1,7 +1,7 @@
 ---
 phase: implement
 mode: afk
-skill: umka:mattpocock_implement
+skill: umka:mattpocock-implement
 from: [source, sort, approve-slicing]
 to:
   - phase: pr
@@ -12,7 +12,7 @@ budget: 150k
 
 **Input:** the ticket URL in this item's `external_ref`; the unit's branch.
 
-**Run:** `/umka:mattpocock_implement <ticket URL>` on the unit's branch.
+**Run:** `/umka:mattpocock-implement <ticket URL>` on the unit's branch.
 
 **Done when:** the full suite is green and every code-review finding is fixed.
 

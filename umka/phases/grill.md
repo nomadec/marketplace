@@ -1,7 +1,7 @@
 ---
 phase: grill
 mode: hitl
-skill: umka:mattpocock_grilling
+skill: umka:mattpocock-grilling
 from: [source, sort, explore, prototype, reproduce]
 to:
   - phase: approve-proposal
@@ -11,7 +11,7 @@ artifact: the spec item under the epic holds the proposal in full, and GLOSSARY 
 
 **Input:** this item's brief when exploration wrote one; else the epic's source: its `external_ref`, or its description.
 
-**Run:** `/umka:mattpocock_grilling` on the source, with the human in the session.
+**Run:** `/umka:mattpocock-grilling` on the source, with the human in the session.
 
 **Done when:** the human says proceed on a proposal.
 

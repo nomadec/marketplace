@@ -4,7 +4,7 @@ import path from "node:path";
 
 export const MODES = ["afk", "hitl", "checkpoint"];
 export const KEYS = ["phase", "mode", "skill", "from", "to", "artifact", "budget", "ask", "auto-close when", "rounds"];
-export const SKILL_NAME = /^[a-z0-9][a-z0-9_-]*$/;
+export const SKILL_NAME = /^(?!.*--)[a-z0-9]([a-z0-9-]{0,62}[a-z0-9])?$/; // the Agent Skills spec: 1-64 of a-z 0-9 and -, no leading, trailing or double hyphen
 
 // What `skill:` names: a skill of this plugin (`umka:<name>`), the human (`human`), or a
 // command the phase runs itself (`tool: <command>`). Null when the field has none of the forms.

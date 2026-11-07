@@ -1,5 +1,5 @@
 ---
-name: mattpocock_research
+name: mattpocock-research
 description: "Investigate the question in the phase brief against high-trust primary sources and capture the findings as a Markdown file under docs/research/ on the branch, every claim cited, with what could not be found named. Umka phase variant of mattpocock-skills:research, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:research

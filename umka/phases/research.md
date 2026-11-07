@@ -1,7 +1,7 @@
 ---
 phase: research
 mode: afk
-skill: umka:mattpocock_research
+skill: umka:mattpocock-research
 from: [explore]
 to:
   - phase: explore
@@ -15,7 +15,7 @@ budget: 80k
 
 **Input:** the question in this item's brief.
 
-**Run:** `/umka:mattpocock_research` on the question.
+**Run:** `/umka:mattpocock-research` on the question.
 
 **Done when:** every claim in the file cites its source, and the file answers the question or names what it could not find.
 

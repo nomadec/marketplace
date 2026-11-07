@@ -1,7 +1,7 @@
 ---
 phase: review
 mode: afk
-skill: umka:mattpocock_code-review
+skill: umka:mattpocock-code-review
 from: [pr, address]
 to:
   - phase: decide-blocking
@@ -12,7 +12,7 @@ budget: 100k
 
 **Input:** the PR URL from the epic's `pr:` note. Fixed point: round 1, the merge-base with the default branch; round N, the `Reviewed at` sha of verdict N-1.
 
-**Run:** `/umka:mattpocock_code-review <fixed point>` on the PR branch, then sort every finding into two buckets.
+**Run:** `/umka:mattpocock-code-review <fixed point>` on the PR branch, then sort every finding into two buckets.
 
 Post the review as the repo's tracker doc says under "Pull requests"; the GitHub form follows. **Blocks merge**: behaviour wrong against the spec, data loss, a security hole, a failing or missing test the spec demands, a documented-standard breach. **Does not block**: smells, naming, style, nits. Post one review carrying the verdict and the blocking findings inline:
 

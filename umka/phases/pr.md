@@ -1,7 +1,7 @@
 ---
 phase: pr
 mode: afk
-skill: umka:mattpocock_pr
+skill: umka:mattpocock-pr
 from: [approve-slicing, implement, fix]
 to:
   - phase: review
@@ -12,7 +12,7 @@ budget: 50k
 
 **Input:** the unit's branch; the spec URL from the epic's `spec:` note (a fix: the source ticket).
 
-**Run:** push the branch, write the body with `/umka:mattpocock_pr`, open the PR as the repo's tracker doc says under "Pull requests" (GitHub form: `gh pr create`), titled from the spec and referencing it the way the tracker links PRs.
+**Run:** push the branch, write the body with `/umka:mattpocock-pr`, open the PR as the repo's tracker doc says under "Pull requests" (GitHub form: `gh pr create`), titled from the spec and referencing it the way the tracker links PRs.
 
 **Done when:** the PR URL exists.
 

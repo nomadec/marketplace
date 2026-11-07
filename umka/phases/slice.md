@@ -1,7 +1,7 @@
 ---
 phase: slice
 mode: afk
-skill: umka:mattpocock_to-tickets
+skill: umka:mattpocock-to-tickets
 from: [source, sort, approve-spec]
 to:
   - phase: approve-slicing
@@ -12,7 +12,7 @@ budget: 100k
 
 **Input:** the spec URL from the epic's `spec:` note.
 
-**Run:** `/umka:mattpocock_to-tickets <spec URL>` on the brief.
+**Run:** `/umka:mattpocock-to-tickets <spec URL>` on the brief.
 
 **Done when:** every ticket is published with its blocking edges and the `ready-for-agent` label.
 

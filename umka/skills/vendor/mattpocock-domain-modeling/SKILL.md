@@ -1,6 +1,6 @@
 ---
-name: mattpocock_domain-modeling
-description: "Build and sharpen a project's domain model while a design is being discussed: challenge terms against GLOSSARY.md, stress-test relationships with concrete scenarios, and write glossary entries and ADRs the moment they crystallise. Companion of umka:mattpocock_grilling in the grill phase. Umka phase variant of mattpocock-skills:domain-modeling, called by name from umka:run; not for auto-triggering."
+name: mattpocock-domain-modeling
+description: "Build and sharpen a project's domain model while a design is being discussed: challenge terms against GLOSSARY.md, stress-test relationships with concrete scenarios, and write glossary entries and ADRs the moment they crystallise. Companion of umka:mattpocock-grilling in the grill phase. Umka phase variant of mattpocock-skills:domain-modeling, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:domain-modeling
   path: skills/engineering/domain-modeling

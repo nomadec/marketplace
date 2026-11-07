@@ -1,5 +1,5 @@
 ---
-name: mattpocock_to-tickets
+name: mattpocock-to-tickets
 description: "Break a published spec into tracer-bullet tickets, each declaring its blocking edges, and publish them as children of the spec labelled ready-for-agent, with no review round mid-run. Umka phase variant of mattpocock-skills:to-tickets, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:to-tickets

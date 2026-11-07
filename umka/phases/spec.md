@@ -1,7 +1,7 @@
 ---
 phase: spec
 mode: afk
-skill: umka:mattpocock_to-spec
+skill: umka:mattpocock-to-spec
 from: [source, sort, approve-proposal, explore]
 to:
   - phase: approve-spec
@@ -12,7 +12,7 @@ budget: 150k
 
 **Input:** the proposal and the problem story in this item's description; the research and ADRs it points at.
 
-**Run:** `/umka:mattpocock_to-spec <source URL from the epic's external_ref>` on the brief.
+**Run:** `/umka:mattpocock-to-spec <source URL from the epic's external_ref>` on the brief.
 
 **Done when:** the spec issue is on the tracker labelled `ready-for-agent`, and in it: every numbered point of the proposal maps to a story; the problem is told with the source's evidence; every path the spec changes has its current behaviour stated from the code; every test seam names an existing test file, or is marked new.
 

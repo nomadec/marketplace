@@ -14,7 +14,7 @@ const run = (cmd, dir) => {
 };
 
 test("skill: parses into the plugin skill, the human, or a tool command", () => {
-  assert.deepEqual(parseSkill("umka:mattpocock_to-spec"), { kind: "skill", name: "mattpocock_to-spec" });
+  assert.deepEqual(parseSkill("umka:mattpocock-to-spec"), { kind: "skill", name: "mattpocock-to-spec" });
   assert.deepEqual(parseSkill("human"), { kind: "human" });
   assert.deepEqual(parseSkill("tool: gh pr merge"), { kind: "tool", command: "gh pr merge" });
   assert.equal(parseSkill("foo"), null);
@@ -23,8 +23,8 @@ test("skill: parses into the plugin skill, the human, or a tool command", () => 
 test("load keeps the raw skill and adds call and a numeric rounds", () => {
   const { phases, errors } = load(fixture("valid"));
   assert.deepEqual(errors, []);
-  assert.equal(phases.work.skill, "umka:vend_one");
-  assert.deepEqual(phases.work.call, { kind: "skill", name: "vend_one" });
+  assert.equal(phases.work.skill, "umka:vend-one");
+  assert.deepEqual(phases.work.call, { kind: "skill", name: "vend-one" });
   assert.deepEqual(phases.ship.call, { kind: "tool", command: "gh pr merge" });
   assert.equal(phases.approve.rounds, 2);
   assert.equal(phases.intake.rounds, undefined);
@@ -41,7 +41,7 @@ test("lint reports every skill, rounds and cycle problem and exits 1", () => {
   assert.equal(r.code, 1);
   assert.deepEqual(r.errors, [
     `a.md: skill: "nope" has no SKILL.md under ${skills}`,
-    'b.md: skill: "Bad.Name" is not /^[a-z0-9][a-z0-9_-]*$/',
+    'b.md: skill: "Bad.Name" is not a skill name: 1-64 of a-z, 0-9 and -, with no leading, trailing or double hyphen',
     'c.md: skill: "locked" sets disable-model-invocation, so the model cannot call it',
     "d.md: skill: human only on a checkpoint or hitl phase",
     'e.md: rounds: "0" is not a positive integer',

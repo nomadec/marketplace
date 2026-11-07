@@ -1,7 +1,7 @@
 ---
 phase: prototype
 mode: hitl
-skill: umka:mattpocock_prototype
+skill: umka:mattpocock-prototype
 from: [explore]
 to:
   - phase: grill
@@ -12,7 +12,7 @@ artifact: the verdict posted on the source ticket, or in the close reason, with 
 
 **Input:** the design question in this item's brief; the source ticket from the epic's `external_ref`.
 
-**Run:** `/umka:mattpocock_prototype` with the human in the session.
+**Run:** `/umka:mattpocock-prototype` with the human in the session.
 
 **Done when:** the human gives the verdict.
 

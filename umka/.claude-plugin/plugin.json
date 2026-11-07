@@ -24,15 +24,15 @@
     "./skills/qa-plan",
     "./skills/reproduce",
     "./skills/run",
-    "./skills/vendor/mattpocock_code-review",
-    "./skills/vendor/mattpocock_domain-modeling",
-    "./skills/vendor/mattpocock_grilling",
-    "./skills/vendor/mattpocock_implement",
-    "./skills/vendor/mattpocock_pr",
-    "./skills/vendor/mattpocock_prototype",
-    "./skills/vendor/mattpocock_research",
-    "./skills/vendor/mattpocock_to-questionnaire",
-    "./skills/vendor/mattpocock_to-spec",
-    "./skills/vendor/mattpocock_to-tickets"
+    "./skills/vendor/mattpocock-code-review",
+    "./skills/vendor/mattpocock-domain-modeling",
+    "./skills/vendor/mattpocock-grilling",
+    "./skills/vendor/mattpocock-implement",
+    "./skills/vendor/mattpocock-pr",
+    "./skills/vendor/mattpocock-prototype",
+    "./skills/vendor/mattpocock-research",
+    "./skills/vendor/mattpocock-to-questionnaire",
+    "./skills/vendor/mattpocock-to-spec",
+    "./skills/vendor/mattpocock-to-tickets"
   ]
 }
