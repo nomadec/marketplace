@@ -8,7 +8,7 @@ origin:
   version: 1.3.2
   commit: a496f5513d4a4cf889bc48e189e579f4b0bdf6aa
   license: MIT
-  adapted: true
+  adapted: false
 metadata:
   credits:
     skill: show-me
@@ -16,8 +16,6 @@ metadata:
     organisation: Humanlayer
     url: "https://github.com/humanlayer/skills/blob/main/plugins/show-me/skills/show-me/SKILL.md"
 ---
-
-The inputs are the unit's branch (its diff against the default branch and its commit list) and the spec URL from the epic's `spec:` note, or the source ticket for a fix. No human is in the session: nothing is asked mid-run. Evidence comes from what the branch holds and what this session can run (the test suite, a command's output); when no before-or-after evidence can be produced, the Evidence section says so in one line instead of inventing it. Any reading the inputs leave open is stated in the body where it bears on the reader.
 
 Use this template for writing the PR body:
 
@@ -178,5 +176,3 @@ Execution-based evidence is A-tier. Test results, console output. Show the exact
 Describe whether it's a one-way or two-way door. You can walk back through two-way doors, but not one-way doors. A PR that is cheap to roll back is lower risk. Changes that involve destructive actions or hard-to-reverse decisions are one-way doors.
 
 The blast radius is the potential impact or scope of the changes introduced by this PR. Consider all possibilities. Examples are layout shift, breakages for consumers, mobile responsiveness, etc.
-
-Attribution for the Summary section's menu of visuals is in [CREDITS.md](./CREDITS.md).

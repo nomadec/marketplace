@@ -12,7 +12,7 @@ budget: 50k
 
 **Input:** the unit's branch; the spec URL from the epic's `spec:` note (a fix: the source ticket).
 
-**Run:** push the branch, write the body with `/umka:mattpocock-pr`, open the PR as the repo's tracker doc says under "Pull requests" (GitHub form: `gh pr create`), titled from the spec and referencing it the way the tracker links PRs.
+**Run:** push the branch, write the body with `/umka:mattpocock-pr`, open the PR as the repo's tracker doc says under "Pull requests" (GitHub form: `gh pr create`), titled from the spec and linked to it. Evidence is what this session can run; when none can be produced, the Evidence section says so in one line. An assumption goes in the body where it bears on the reader. A repo PR template is the skeleton: fill it, then add Summary, Evidence and Merge Danger where it has no equivalent section.
 
 **Done when:** the PR URL exists.
 
