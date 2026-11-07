@@ -11,7 +11,9 @@ artifact: the spec item under the epic holds the proposal in full, and GLOSSARY 
 
 **Input:** this item's brief when exploration wrote one; else the epic's source: its `external_ref`, or its description.
 
-**Run:** `/umka:mattpocock-grilling` on the source, with the human in the session.
+**Run:** `/umka:mattpocock-grilling` on the source, with the human in the session, and `/umka:mattpocock-domain-modeling` beside it for the whole session, so glossary entries and ADRs land on the branch as the design settles.
+
+Each round's frontier carries **product decisions** only, in the register `umka:run` sets, each question with its recommended answer. An **engineering decision** the round uncovers is not a question: take it, write it as an ADR on the branch, and list it under the round as one line each, below the questions.
 
 **Done when:** the human says proceed on a proposal.
 
