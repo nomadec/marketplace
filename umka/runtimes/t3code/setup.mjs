@@ -97,25 +97,35 @@ export function digest(dir) {
   return hash.digest('hex');
 }
 export const shellQuote = s => `'${s.replaceAll("'", "'\\''")}'`;
-function t3(o, run, args) { return run(o.t3, [...args, ...(o.t3Home ? ['--base-dir', o.t3Home] : [])]); }
+// Every T3 CLI call goes through here so the explicit base dir is never forgotten.
+export const t3call = (o, run, args) => run(o.t3, [...args, ...(o.t3Home ? ['--base-dir', o.t3Home] : [])]);
 
+// A directory lock keyed by instance. `work` may return a promise; the lock is held until it settles.
+// With `onBusy`, a lock whose owner is still alive (or has not yet recorded its PID) yields onBusy().
 export function withLock(key, work, onBusy) {
   const lock = path.join(os.tmpdir(), `umka-t3code-${createHash('sha256').update(key).digest('hex').slice(0, 24)}.lock`);
   try { fs.mkdirSync(lock, { mode: 0o700 }); }
   catch (e) {
     if (e.code !== 'EEXIST') throw e;
     if (onBusy) {
-      const pid = Number(fs.readFileSync(path.join(lock, 'pid'), 'utf8'));
+      let pid;
+      try { pid = Number(fs.readFileSync(path.join(lock, 'pid'), 'utf8')); }
+      catch (error) { if (error.code !== 'ENOENT') throw error; return onBusy(); } // Owner is between mkdir and its PID write.
       if (Number.isInteger(pid) && pid > 0) {
         try { process.kill(pid, 0); return onBusy(); } catch (error) { if (error.code !== 'ESRCH') throw error; }
       }
     }
     throw new Error(`Another setup operation may be active (${lock}). After a crash, inspect the recorded PID and outcome before removing this lock.`);
   }
+  const release = () => fs.rmSync(lock, { recursive: true, force: true });
+  let result;
   try {
     fs.writeFileSync(path.join(lock, 'pid'), String(process.pid));
-    return work();
-  } finally { fs.rmSync(lock, { recursive: true }); }
+    result = work();
+  } catch (e) { release(); throw e; }
+  if (typeof result?.then === 'function') return result.finally(release);
+  release();
+  return result;
 }
 
 function config(o) {
@@ -147,7 +157,7 @@ function prerequisites(o, run) {
   const t3Version = run(o.t3, ['--version']);
   // This works before registration too: T3 may resolve an ancestor project.
   // Registration below still checks the exact project path.
-  try { t3(o, run, ['thread', 'list', '--project', o.project, '--json']); }
+  try { t3call(o, run, ['thread', 'list', '--project', o.project, '--json']); }
   catch (e) {
     if (!/project.*not found|no (T3 Code )?project|could not resolve.*project/i.test(e.message)) throw new Error(`T3 is not reachable: ${e.message}`);
   }
@@ -215,9 +225,9 @@ function configure(o, run, log) {
   const receipt = { schema: 2, instance: o.instance, home: o.home, project: o.project, t3: o.t3, t3Home: o.t3Home || null, versions, plugin: expected, repos: c.repos };
   if (o.mode === 'apply') {
     ensureHome(o, run, c);
-    try { t3(o, run, ['project', 'add', o.project, '--title', 'Umka']); }
+    try { t3call(o, run, ['project', 'add', o.project, '--title', 'Umka']); }
     catch (e) { if (!e.message.includes('ProjectAlreadyExistsError')) throw e; }
-    t3(o, run, ['thread', 'list', '--project', o.project, '--json']);
+    t3call(o, run, ['thread', 'list', '--project', o.project, '--json']);
     write(path.join(o.home, 'bin/umka'), wrapper(o));
     fs.chmodSync(path.join(o.home, 'bin/umka'), 0o700);
     write(path.join(o.home, 'bin/umka-t3'), runtimeWrapper(o));
