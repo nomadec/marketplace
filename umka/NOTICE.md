@@ -92,3 +92,21 @@ Skills under `skills/vendor/` are forks of third-party skills, adapted to run he
 - License: MIT
 - Copyright (c) 2026 Matt Pocock
 - Summary visuals in the pr skill come from Dex Horthy's `show-me` skill (Humanlayer), see `skills/vendor/mattpocock-pr/CREDITS.md`
+
+## mattpocock-tdd
+
+- Upstream: `mattpocock-skills:tdd` (`skills/engineering/tdd`)
+- Repo: https://github.com/mattpocock/skills
+- Version: 1.3.2
+- Commit: a496f5513d4a4cf889bc48e189e579f4b0bdf6aa
+- License: MIT
+- Copyright (c) 2026 Matt Pocock
+
+## mattpocock-codebase-design
+
+- Upstream: `mattpocock-skills:codebase-design` (`skills/engineering/codebase-design`)
+- Repo: https://github.com/mattpocock/skills
+- Version: 1.3.2
+- Commit: a496f5513d4a4cf889bc48e189e579f4b0bdf6aa
+- License: MIT
+- Copyright (c) 2026 Matt Pocock
