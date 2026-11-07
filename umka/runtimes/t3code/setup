@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+import { main } from './setup.mjs';
+main().catch(error => { console.error(`setup: ${error.message}`); process.exitCode = 1; });

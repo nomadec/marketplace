@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test \"umka/skills/run/*.test.mjs\" \"umka/hooks/*.test.mjs\" \"scripts/*.test.mjs\""
+    "test": "node --test \"umka/lib/*.test.mjs\" \"umka/phases/*.test.mjs\" \"umka/hooks/*.test.mjs\" \"umka/runtimes/*/*.test.mjs\""
   }
 }

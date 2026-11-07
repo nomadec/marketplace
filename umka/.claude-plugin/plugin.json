@@ -1,15 +1,38 @@
 {
   "name": "umka",
   "version": "0.1.0",
-  "description": "What the workflows of Umka share: the pick, which chooses the next ticket of a spec issue, and the publish script, which pushes the branch and opens a ready pull request, both run by the host, and the skill findings, which shapes the links and facts a conversation hands to the host with its request; the plugin ships no command.",
+  "description": "The delivery loop: a unit of work is a beads epic with one child per phase; a turn works one phase in one fresh session, closes out, lays the next phases and stops. A library of skills (Umka's own and forks of third-party ones), a phase registry that assembles them into journeys, and two runtimes, terminal and T3 Code, that start turns from a timer.",
   "author": {
     "name": "nomadec"
   },
   "repository": "https://github.com/nomadec/umka",
   "keywords": [
-    "tickets",
-    "issues",
+    "delivery-loop",
+    "beads",
+    "phases",
+    "skills",
     "pull-request",
     "workflow"
+  ],
+  "skills": [
+    "./skills/addressing-pr-comments",
+    "./skills/answer",
+    "./skills/explore",
+    "./skills/findings",
+    "./skills/fix",
+    "./skills/intake",
+    "./skills/qa-plan",
+    "./skills/reproduce",
+    "./skills/run",
+    "./skills/vendor/mattpocock_code-review",
+    "./skills/vendor/mattpocock_domain-modeling",
+    "./skills/vendor/mattpocock_grilling",
+    "./skills/vendor/mattpocock_implement",
+    "./skills/vendor/mattpocock_pr",
+    "./skills/vendor/mattpocock_prototype",
+    "./skills/vendor/mattpocock_research",
+    "./skills/vendor/mattpocock_to-questionnaire",
+    "./skills/vendor/mattpocock_to-spec",
+    "./skills/vendor/mattpocock_to-tickets"
   ]
 }
