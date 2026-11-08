@@ -1,6 +1,6 @@
 ---
 name: mattpocock-to-questionnaire
-description: "Turn a decision the turn cannot answer alone into a Markdown questionnaire for the person who holds the knowledge. Verbatim copy of mattpocock-skills:to-questionnaire, called by name from umka:run; not for auto-triggering."
+description: "Turn a decision the turn cannot answer alone into a Markdown questionnaire for the person who holds the knowledge."
 origin:
   skill: mattpocock-skills:to-questionnaire
   path: skills/productivity/to-questionnaire

@@ -1,6 +1,6 @@
 ---
 name: mattpocock-implement
-description: "Implement a piece of work based on a spec or set of tickets, test-first through umka:mattpocock-tdd, then reviewed through umka:mattpocock-code-review. Umka phase variant of mattpocock-skills:implement, called by name from umka:run; only the two skill names changed. Not for auto-triggering."
+description: "Implement a piece of work based on a spec or set of tickets, test-first through umka:mattpocock-tdd, then reviewed through umka:mattpocock-code-review."
 origin:
   skill: mattpocock-skills:implement
   path: skills/engineering/implement

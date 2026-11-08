@@ -1,6 +1,6 @@
 ---
 name: mattpocock-to-spec
-description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed. Verbatim copy of mattpocock-skills:to-spec, called by name from umka:run; not for auto-triggering."
+description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
 origin:
   skill: mattpocock-skills:to-spec
   path: skills/engineering/to-spec

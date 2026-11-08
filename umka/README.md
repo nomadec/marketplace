@@ -23,9 +23,7 @@ Prefix means provenance. `umka:explore` is Umka's own. `umka:mattpocock-to-spec`
 fork of `mattpocock-skills:to-spec`. A fork keeps the upstream voice and records
 `origin:` (upstream id, repo, version, commit, license, whether it was adapted). The
 forks exist so that an unattended phase can invoke them through the Skill tool and so
-that an install of this plugin depends on nothing outside it. Each fork's description
-says it is the Umka phase variant and is called by name, so it does not auto-trigger
-beside the upstream skill when both are installed.
+that an install of this plugin depends on nothing outside it.
 
 The boundary between a skill and a phase: the skill owns how to do the job given its
 inputs; the phase owns where the inputs come from, the artifact, and what comes next.

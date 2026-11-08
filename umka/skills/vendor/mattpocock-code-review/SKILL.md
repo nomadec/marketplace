@@ -1,6 +1,6 @@
 ---
 name: mattpocock-code-review
-description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes, Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?), in parallel sub-agents, and report them side by side with no question asked mid-run. Umka phase variant of mattpocock-skills:code-review, called by name from umka:run; not for auto-triggering."
+description: "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes, Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?), in parallel sub-agents, and report them side by side with no question asked mid-run."
 origin:
   skill: mattpocock-skills:code-review
   path: skills/engineering/code-review

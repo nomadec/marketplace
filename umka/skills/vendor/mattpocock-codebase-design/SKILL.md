@@ -1,6 +1,6 @@
 ---
 name: mattpocock-codebase-design
-description: "Shared vocabulary for designing deep modules: module, interface, depth, seam, adapter, leverage and locality. Reference consulted by umka:mattpocock-tdd when the shape of an interface is in question. Umka phase variant of mattpocock-skills:codebase-design; not for auto-triggering."
+description: "Shared vocabulary for designing deep modules: module, interface, depth, seam, adapter, leverage and locality. Reference consulted by umka:mattpocock-tdd when the shape of an interface is in question."
 origin:
   skill: mattpocock-skills:codebase-design
   path: skills/engineering/codebase-design

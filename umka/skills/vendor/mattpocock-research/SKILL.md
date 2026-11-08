@@ -1,6 +1,6 @@
 ---
 name: mattpocock-research
-description: "Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Verbatim copy of mattpocock-skills:research, called by name from umka:run; not for auto-triggering."
+description: "Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo."
 origin:
   skill: mattpocock-skills:research
   path: skills/engineering/research

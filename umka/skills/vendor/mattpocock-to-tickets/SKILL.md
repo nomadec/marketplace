@@ -1,6 +1,6 @@
 ---
 name: mattpocock-to-tickets
-description: "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker. Verbatim copy of mattpocock-skills:to-tickets, called by name from umka:run; not for auto-triggering."
+description: "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker."
 origin:
   skill: mattpocock-skills:to-tickets
   path: skills/engineering/to-tickets

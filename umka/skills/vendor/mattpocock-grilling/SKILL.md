@@ -1,6 +1,6 @@
 ---
 name: mattpocock-grilling
-description: "Grill the human relentlessly about a plan, decision, or idea, one round of numbered questions at a time. Umka phase variant of mattpocock-skills:grilling, called by name from umka:run; not for auto-triggering."
+description: "Grill the human relentlessly about a plan, decision, or idea, one round of numbered questions at a time."
 origin:
   skill: mattpocock-skills:grilling
   path: skills/productivity/grilling
