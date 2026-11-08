@@ -8,7 +8,7 @@ to:
     per: ticket
   - phase: pr
 artifact: the checkpoint is closed
-ask: the tickets, one line each with their blockers, and the spec URL
+ask: the tickets, one line each with the story it delivers, its blockers and its assumption when it has one, and the spec URL
 ---
 # approve slicing
 
