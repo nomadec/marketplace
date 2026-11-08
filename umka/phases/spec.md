@@ -10,11 +10,11 @@ budget: 150k
 ---
 # spec
 
-**Input:** the proposal and the problem story in this item's description; the research and ADRs it points at.
+**Input:** the brief in this item's description: the proposal, the problem story, and the research and ADRs it points at, read in full. The brief is the conversation the skill synthesizes, and it is the scope: a story the proposal does not cover goes under Out of Scope. The source is the epic's `external_ref`, or its description.
 
-**Run:** `/umka:mattpocock-to-spec <source URL from the epic's external_ref>` on the brief.
+**Run:** `/umka:mattpocock-to-spec` on the brief; publish as the repo's tracker doc says, with the spec linking the source. Nobody is in the session to check the seams with: write them into Testing Decisions as decisions, each with one line on what it catches and what it misses; the human checks them at `approve spec`. A decision the brief leaves open is taken the engineering way and marked `Assumption:`, so the human can overturn it there too.
 
-**Done when:** the spec issue is on the tracker labelled `ready-for-agent`, and in it: every numbered point of the proposal maps to a story; the problem is told with the source's evidence; every path the spec changes has its current behaviour stated from the code; every test seam names an existing test file, or is marked new.
+**Done when:** the spec issue is on the tracker labelled `ready-for-agent`, and in it: every numbered point of the proposal maps to a story; the problem is told with the source's evidence; a **Current Behaviour** section before Implementation Decisions states, for every path the spec changes, what the code does there today, read from the modules and tests; every test seam names an existing test file, or is marked `new`.
 
 **Reconcile:** the epic's `spec:` note names an issue that exists: done. The issue exists and the note is missing: add the note only.
 
