@@ -65,7 +65,7 @@ test('dry runs do not launch or write journals and manual claims block managed t
 
 test('briefed checkpoints appear in inbox and explicit answers become eligible for the next tick', t => {
   const f = fixture(t);
-  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  f.state.issues[1].labels = ['phase:decide-fix', 'checkpoint', 'briefed'];
   assert.equal(inbox(f.o, f.run)[0].id, 'u-1.1');
   answer(f.o, 'u-1.1', 'Yes, exactly this scope.', f.run);
   assert.equal(f.state.issues[1].close_reason, 'Yes, exactly this scope.');
@@ -90,7 +90,7 @@ test('empty inbox checks never call T3 or create an inbox journal', t => {
 
 test('each waiting item has one conversation across repeated inbox checks and restarts', t => {
   const f = fixture(t);
-  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  f.state.issues[1].labels = ['phase:decide-fix', 'checkpoint', 'briefed'];
   f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', title: 'another checkpoint' });
   const first = openInbox(f.o, f.run);
   assert.equal(first.items.length, 2);
@@ -104,7 +104,7 @@ test('each waiting item has one conversation across repeated inbox checks and re
 
 test('a phase thread that produced the brief becomes its inbox conversation', t => {
   const f = fixture(t);
-  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint'];
+  f.state.issues[1].labels = ['phase:decide-fix', 'checkpoint'];
   tick(f.o, {}, f.run);
   f.state.threadStatus = 'completed';
   f.state.issues[1].labels.push('briefed');
@@ -115,7 +115,7 @@ test('a phase thread that produced the brief becomes its inbox conversation', t 
 
 test('a re-briefed item opens a fresh conversation instead of reusing its settled phase thread', t => {
   const f = fixture(t);
-  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint'];
+  f.state.issues[1].labels = ['phase:decide-fix', 'checkpoint'];
   tick(f.o, {}, f.run);
   f.state.threadStatus = 'completed';
   f.state.issues[1].labels.push('briefed');
@@ -129,7 +129,7 @@ test('a re-briefed item opens a fresh conversation instead of reusing its settle
 
 test('closed inbox conversations are dropped and the runner history stays bounded', t => {
   const f = fixture(t);
-  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  f.state.issues[1].labels = ['phase:decide-fix', 'checkpoint', 'briefed'];
   openInbox(f.o, f.run);
   const items = path.join(f.o.home, 't3code/inbox-items.json');
   assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(items)).items), ['u-1.1']);
@@ -150,7 +150,7 @@ test('closed inbox conversations are dropped and the runner history stays bounde
 
 test('conversations of items deleted from beads are dropped from the inbox journal', t => {
   const f = fixture(t);
-  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint', 'briefed'];
+  f.state.issues[1].labels = ['phase:decide-fix', 'checkpoint', 'briefed'];
   openInbox(f.o, f.run);
   const items = path.join(f.o.home, 't3code/inbox-items.json');
   assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(items)).items), ['u-1.1']);
@@ -198,7 +198,7 @@ test('inbox and tick share a lock and a live owner causes a harmless skip', t =>
 test('inbox conversations can open while an unrelated autonomous phase is running', t => {
   const f = fixture(t);
   tick(f.o, {}, f.run);
-  f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', title: 'approval', labels: ['phase:approve-proposal', 'briefed'] });
+  f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', title: 'approval', labels: ['phase:decide-fix', 'briefed'] });
   assert.equal(openInbox(f.o, f.run).items[0].itemId, 'u-1.2');
   assert.equal(f.state.launches, 2);
   assert.equal(resumeInbox(f.o, 'u-1.2', f.run).status, 'busy');

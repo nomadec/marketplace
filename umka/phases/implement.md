@@ -2,7 +2,7 @@
 phase: implement
 mode: afk
 skill: umka:mattpocock-implement
-from: [source, sort, approve-slicing]
+from: [source, sort, slice]
 to:
   - phase: pr
 artifact: the ticket is closed with a report comment and every acceptance criterion ticked
