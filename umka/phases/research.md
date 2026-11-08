@@ -13,11 +13,11 @@ budget: 80k
 ---
 # research
 
-**Input:** the question in this item's brief.
+**Input:** the question in this item's brief, read in full before anything else. The file goes under `docs/research/` on the branch, named from the question's slug; Reconcile looks for it there.
 
-**Run:** `/umka:mattpocock-research` on the question.
+**Run:** `/umka:mattpocock-research` on the question, and wait for the agent's report. A choice the question leaves open (library version, platform, a reading of an ambiguous term): take the one the brief and the repo make most likely, and record it in the file under **Assumptions**. Each further question the findings open goes under **Questions opened**, one line each.
 
-**Done when:** every claim in the file cites its source, and the file answers the question or names what it could not find.
+**Done when:** the file is on the branch, every claim in it cites its source, and it answers the question or names what it could not find and what was tried for each gap.
 
 **Reconcile:** the file exists on the branch: done.
 
