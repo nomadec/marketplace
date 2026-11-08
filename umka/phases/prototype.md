@@ -12,10 +12,10 @@ artifact: the verdict posted on the source ticket, or in the close reason, with 
 
 **Input:** the design question in this item's brief; the source ticket from the epic's `external_ref`.
 
-**Run:** `/umka:mattpocock-prototype` with the human in the session.
+**Run:** `/umka:mattpocock-prototype` on a throwaway git branch off the unit's branch, from the first commit.
 
 **Done when:** the human gives the verdict.
 
 **Reconcile:** the verdict comment exists: done.
 
-**Close out:** post the verdict on the source ticket (none: the close reason) with the branch pointer. The prototype stays on its branch, out of the default branch.
+**Close out:** post the verdict on the source ticket (none: the close reason) with the branch pointer. The decision travels in the verdict to the next item.
