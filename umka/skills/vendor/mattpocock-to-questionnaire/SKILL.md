@@ -1,6 +1,6 @@
 ---
 name: mattpocock-to-questionnaire
-description: "Turn a question the agent cannot answer alone into a Markdown questionnaire for the person who holds the knowledge, with the recipient and the needed answers taken from the brief. Umka phase variant of mattpocock-skills:to-questionnaire, called by name from umka:run; not for auto-triggering."
+description: "Turn a decision the turn cannot answer alone into a Markdown questionnaire for the person who holds the knowledge. Verbatim copy of mattpocock-skills:to-questionnaire, called by name from umka:run; not for auto-triggering."
 origin:
   skill: mattpocock-skills:to-questionnaire
   path: skills/productivity/to-questionnaire
@@ -8,28 +8,23 @@ origin:
   version: 1.3.2
   commit: a496f5513d4a4cf889bc48e189e579f4b0bdf6aa
   license: MIT
-  adapted: true
+  adapted: false
 ---
 
-# To Questionnaire
+Turn something the user can't answer alone into a **questionnaire**: a Markdown document they hand to one person to fill in async, or fill out together over a meeting. The recipient holds knowledge the user lacks; the questionnaire pulls it out of them.
 
-Turn something the unit cannot answer alone into a **questionnaire**: a Markdown document one person fills in async, or fills out together over a meeting. The recipient holds knowledge the unit lacks; the questionnaire pulls it out of them.
+**Grill the send, not the subject.** Interview the user only about the _send_, which they can always answer: who it goes to, and what they need back. The questions in the document then target the **gap** between what the recipient knows and what the user needs.
 
-**Grill the send, not the subject.** The two facts about the _send_ (who it goes to, and what is needed back) normally come from an interview. The session is fresh and no human is in it, so they come from the brief instead. The questions in the document then target the **gap** between what the recipient knows and what the unit needs.
 
-## Inputs
+1. **Who is it going to?** Ask, in one exchange, the recipient's role, expertise, and relationship to the user. This fixes the questionnaire's tone and how much context it must carry. Done when you know who the recipient is and what they know that the user doesn't.
 
-The phase item's description: the question as asked, the source's facts, who asked, what a good answer looks like, and who holds the knowledge (the explore phase names them on its first line).
+2. **What do you need back?** Ask, in one exchange, the specific decisions or facts the user can't resolve alone and needs from this person. Done when you have a concrete list of what the user must walk away able to do or decide.
 
-1. **Who is it going to?** Take the recipient's role, expertise, and relationship to the asker from the brief. This fixes the questionnaire's tone and how much context it must carry. The brief names a person but not their expertise: infer it from the source, and write the inference into the Context section as `Assumption:` so the recipient can correct it. The brief names nobody: address it to the person who asked, and say so the same way.
-
-2. **What do you need back?** List the specific decisions or facts the unit cannot resolve alone and needs from this person: what the brief says is missing, and what the unit must be able to do or decide once the answers are in. Done when the list is concrete.
-
-3. **Write the questionnaire.** Draft questions aimed at the gap from steps 1–2, following the Document structure below. Write it to `to-questionnaire-<slug>.md` in the worktree root (slug from the topic) and report the path. Done when the file exists and every item listed in step 2 is covered by a question.
+3. **Write the questionnaire.** Draft questions aimed at the gap from steps 1–2, following the Document structure below. Write it to `to-questionnaire-<slug>.md` in the current directory (slug from the topic) and report the path. Done when the file exists and every item the user named in step 2 is covered by a question.
 
 ## Document structure
 
-Frame the document as a **discovery questionnaire**: the asker lacks context, the recipient holds it. Order questions most-important-first, since async means you may only get one pass, and group them under `##` headings by theme once there are more than a handful. Write it using the template below.
+Frame the document as a **discovery questionnaire**: the user lacks context, the recipient holds it. Order questions most-important-first, since async means you may only get one pass, and group them under `##` headings by theme once there are more than a handful. Write it using the template below.
 
 <questionnaire-template>
 
@@ -37,11 +32,11 @@ Frame the document as a **discovery questionnaire**: the asker lacks context, th
 
 **Purpose:** why this questionnaire exists and the decision riding on it.
 
-**From:** <the asker>, **To:** <the recipient>, **How your answers will be used:** <where they go>
+**From:** <the user>, **To:** <the recipient>, **How your answers will be used:** <where they go>
 
 ## Context
 
-One paragraph orienting a recipient who wasn't in the asker's head. Enough to answer well, not a page. Any `Assumption:` about the recipient or the gap goes here.
+One paragraph orienting a recipient who wasn't in the user's head. Enough to answer well, not a page.
 
 ## How to answer
 
@@ -64,7 +59,3 @@ _Why this matters: it decides whether we provision for burst traffic now or defe
 A closing catch-all: anything we didn't ask that we should know?
 
 </questionnaire-template>
-
-## Output
-
-The file path, and the list from step 2 with the question that covers each item.
