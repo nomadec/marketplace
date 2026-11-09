@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { tick, inbox, answer, openInbox, resumeInbox, HISTORY_LIMIT } from './umka-t3-runtime.mjs';
+import { tick, inbox, answer, openInbox, resumeInbox, timeline, HISTORY_LIMIT } from './umka-t3-runtime.mjs';
 import { withLock, write } from './umka-t3code.mjs';
 
 function fixture(t) {
@@ -11,8 +11,8 @@ function fixture(t) {
   t.after(() => fs.rmSync(home, { recursive: true, force: true }));
   const o = { home, instance: 'test', t3: 't3', project: '/test/project' };
   const state = {
-    launches: 0, threadStatus: 'running', failLaunch: false,
-    issues: [{ id: 'u-1', issue_type: 'epic', status: 'open', labels: ['loop'] }, { id: 'u-1.1', parent: 'u-1', title: 'answer', status: 'open', labels: ['phase:answer'], description: 'A test answer' }],
+    launches: 0, threadStatus: 'running', failLaunch: false, sends: [], replyWithoutLink: false,
+    issues: [{ id: 'u-1', issue_type: 'epic', title: 'First unit', status: 'open', labels: ['loop'] }, { id: 'u-1.1', parent: 'u-1', title: 'answer', status: 'open', labels: ['phase:answer'], description: 'A test answer' }],
   };
   const run = (exe, args) => {
     if (exe === 'bd') {
@@ -23,8 +23,16 @@ function fixture(t) {
       }
     }
     if (exe === 't3' && args[0] === 'thread') {
-      if (args[1] === 'start') { state.launches++; if (state.failLaunch) throw new Error('Lost response'); return JSON.stringify({ threadId: `thread-${state.launches}` }); }
-      if (args[1] === 'show') return JSON.stringify({ thread: { status: state.threadStatus, providerInstanceId: 'claudeAgent', model: 'project-default', runtimeMode: 'full-access', interactionMode: 'default' } });
+      if (args[1] === 'start') { state.launches++; if (state.failLaunch) throw new Error('Lost response'); return JSON.stringify({ threadId: `thread-${state.launches}`, status: 'completed', reply: 'ready' }); }
+      if (args[1] === 'send') {
+        state.sends.push({ threadId: args[2], message: args[3] });
+        const child = `thread:delegated-task:child-${state.sends.length}`;
+        const reply = state.replyWithoutLink ? 'ignored'
+          : state.v2Links ? `started u-1.1 answer\n<t3-thread://v2/env-1/${child}>`
+          : `started\n[Umka test: u-1.1 answer](t3-thread://v1/${child})`;
+        return JSON.stringify({ threadId: args[2], status: 'completed', reply });
+      }
+      if (args[1] === 'show') return JSON.stringify({ thread: { status: state.threadStatus, providerInstanceId: 'claudeAgent', model: 'project-default', runtimeMode: 'full-access', interactionMode: 'default' }, messages: [{ role: 'assistant', text: state.lastMessage || '' }] });
     }
     throw new Error(`Unexpected ${exe}: ${args.join(' ')}`);
   };
@@ -213,4 +221,79 @@ test('a human clarification without claiming work releases the worker slot', t =
   assert.equal(tick(f.o, {}, f.run).status, 'waiting');
   f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', labels: ['phase:answer'] });
   assert.equal(tick(f.o, {}, f.run).status, 'started');
+});
+
+test('with the timeline on, one parent thread per epic dispatches every afk phase to a child', t => {
+  const f = fixture(t);
+  timeline(f.o, 'enable');
+  const first = tick(f.o, {}, f.run);
+  assert.equal(first.status, 'started');
+  assert.equal(f.state.launches, 1);
+  assert.equal(first.threadId, 'thread:delegated-task:child-1');
+  assert.equal(first.timelineId, 'thread-1');
+  assert.deepEqual(f.state.sends, [{ threadId: 'thread-1', message: 'tick u-1.1 answer afk' }]);
+  assert.equal(tick(f.o, {}, f.run).status, 'busy');
+  f.state.threadStatus = 'completed'; f.state.issues[1].status = 'closed';
+  f.state.issues.push({ id: 'u-1.2', parent: 'u-1', title: 'review', status: 'open', labels: ['phase:review'], description: 'Next' });
+  const second = tick(f.o, {}, f.run);
+  assert.equal(second.status, 'started');
+  assert.equal(f.state.launches, 1);
+  assert.equal(second.threadId, 'thread:delegated-task:child-2');
+  assert.equal(f.state.sends[1].message, 'tick u-1.2 review afk');
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(f.o.home, 't3code/timeline.json'))).epics, { 'u-1': { threadId: 'thread-1' } });
+});
+
+test('a parent reply with an environment-scoped thread link still names the child', t => {
+  const f = fixture(t);
+  timeline(f.o, 'enable');
+  f.state.v2Links = true;
+  assert.equal(tick(f.o, {}, f.run).threadId, 'thread:delegated-task:child-1');
+});
+
+test('a parent that starts no child leaves an uncertain turn that stops further ticks', t => {
+  const f = fixture(t);
+  timeline(f.o, 'enable');
+  f.state.replyWithoutLink = true;
+  assert.throws(() => tick(f.o, {}, f.run), /did not start a phase/);
+  assert.throws(() => tick(f.o, {}, f.run), /uncertain outcome/);
+  assert.equal(f.state.sends.length, 1);
+});
+
+test('a brief posted by a timeline child points the inbox at the parent thread', t => {
+  const f = fixture(t);
+  timeline(f.o, 'enable');
+  f.state.issues[1].labels = ['phase:approve-proposal', 'checkpoint'];
+  tick(f.o, {}, f.run);
+  f.state.threadStatus = 'completed';
+  f.state.issues[1].labels.push('briefed');
+  assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+  assert.equal(inbox(f.o, f.run)[0].threadId, 'thread-1');
+  assert.equal(openInbox(f.o, f.run).items[0].threadId, 'thread-1');
+  assert.equal(f.state.launches, 1);
+});
+
+test('attended work and a disabled timeline both use a thread of their own', t => {
+  const f = fixture(t);
+  timeline(f.o, 'enable');
+  f.state.issues[1].labels = ['phase:grill', 'briefed'];
+  assert.equal(tick(f.o, { attendedId: 'u-1.1' }, f.run).threadId, 'thread-1');
+  assert.equal(f.state.sends.length, 0);
+  const g = fixture(t);
+  timeline(g.o, 'enable');
+  timeline(g.o, 'disable');
+  assert.equal(tick(g.o, {}, g.run).threadId, 'thread-1');
+  assert.equal(g.state.sends.length, 0);
+});
+
+test('a turn that ends with a result line for its item settles even when the item is unchanged', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:approve-merge', 'checkpoint'];
+  tick(f.o, {}, f.run);
+  f.state.threadStatus = 'completed';
+  f.state.lastMessage = 'Round 4 is already laid ahead of this checkpoint.\n\nu-1.1 waits: address round 4 (u-1.2) laid ahead of it for 1 open thread';
+  assert.equal(tick(f.o, {}, f.run).status, 'started');
+  assert.equal(f.state.launches, 2);
+  f.state.threadStatus = 'completed';
+  f.state.lastMessage = 'u-1.9 waits: a line about another item';
+  assert.throws(() => tick(f.o, {}, f.run), /did not finish/);
 });

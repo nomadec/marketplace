@@ -38,11 +38,83 @@ const digest = text => createHash('sha256').update(text || '').digest('hex');
 // A re-briefed item (changed description) gets a fresh conversation instead of a stale thread.
 function conversation(j, saved, item) {
   if (saved[item.id]) return saved[item.id];
-  if (j.active?.itemId === item.id) return j.active;
-  return j.history.findLast(h => h.itemId === item.id && h.brief === digest(item.description));
+  const record = j.active?.itemId === item.id ? j.active : j.history.findLast(h => h.itemId === item.id && h.brief === digest(item.description));
+  // A phase run from a unit timeline takes its replies in that timeline, not in the child.
+  return record?.timelineId ? { ...record, threadId: record.timelineId } : record;
 }
 export function homeInstructions(o) {
   return `The Umka instance home is ${JSON.stringify(o.home)}. In every shell invocation set UMKA_HOME=${shellQuote(o.home)} and in every beads command use bd -C ${shellQuote(o.home)}. Use this home exclusively, never an implicit default.`;
+}
+
+// The unit timeline: one parent T3 thread per epic that dispatches each afk phase to a child
+// thread (a fresh session) and takes the human's replies. timeline.json holds the switch and
+// the parent per epic; the tick creates a parent on first use.
+function timelineJournal(o) {
+  const file = path.join(o.home, 't3code/timeline.json');
+  return { file, data: fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { enabled: false, epics: {} } };
+}
+export function timeline(o, action) {
+  if (!['enable', 'disable', 'status'].includes(action)) throw new Error('usage: umka-t3 timeline enable | disable | status');
+  const t = timelineJournal(o);
+  if (action !== 'status') { t.data.enabled = action === 'enable'; write(t.file, t.data); }
+  return { status: t.data.enabled ? 'enabled' : 'disabled', epics: t.data.epics };
+}
+function phasePrompt(o, id) {
+  return [
+    `Umka phase ${id}, instance ${o.instance}. ${homeInstructions(o)}`,
+    `Invoke the Skill tool with skill "umka:run" and args "${id} afk". Follow it for one phase, then stop.`,
+    'Do not run tick, inbox-open, or nested claude. Never invent a human answer.',
+    'If the phase needs a human, post its brief and stop. The human answers in the unit timeline, not here.',
+    "Your final message is the skill's result line and nothing else.",
+  ].join(' ');
+}
+function timelinePrompt(o, epic) {
+  const bin = shellQuote(path.join(o.home, 'bin/umka-t3'));
+  return `You are the timeline of Umka unit ${epic.id} (${epic.title}), instance ${o.instance}. ${homeInstructions(o)}
+You keep this thread short. You never do phase work yourself and never run tick, inbox-open, the terminal inbox, nested claude, or a bd command that writes.
+
+Rules for every later message:
+
+1. A message "tick <id> <title> afk" comes from the scheduler. Call delegate_task once, mode "async", title "Umka ${o.instance}: <id> <title>", and as the task this text with <id> filled in, exactly:
+${phasePrompt(o, '<id>')}
+Then reply with the line "started <id> <title>" and the child thread link, nothing else.
+
+2. When a child finishes, reply with its final line only. If that line reads "<id> briefed: ...", first run bd show <id> --json, post the item's description in a fenced block with its last "To answer" line replaced by "To answer: reply here.", then the final line.
+
+3. A message from the human is an answer. It answers the item it names, else the item of the latest "briefed" line. Write the human's text exactly, UTF-8, to a temporary file and run ${bin} answer <id> --file ABSOLUTE_PATH, then remove the file. Reply with the command's status in one line. If it reports busy or locked, wait ten seconds and retry, up to five times. If it reports that the item needs a conversation, reply with the line "To work it: umka-t3 work <id>". If the answer is ambiguous, ask one question and stop.
+
+4. A question from the human: answer it from bd show output and stop.
+
+5. Any other message: reply "ignored".
+
+For this first message reply "ready".`;
+}
+function dispatchToTimeline(o, j, item, epic, run) {
+  const t = timelineJournal(o);
+  let record = t.data.epics[epic.id];
+  if (record?.launching) throw new Error(`The timeline launch for ${epic.id} is uncertain; inspect T3 and t3code/timeline.json before retrying`);
+  if (!record) {
+    t.data.epics[epic.id] = { launching: true };
+    write(t.file, t.data);
+    const launched = JSON.parse(t3call(o, run, ['thread', 'start', o.project, timelinePrompt(o, epic), '--title', `Umka ${o.instance}: ${epic.id} ${epic.title}`.slice(0, 200), '--wait', '--json']));
+    if (!launched.threadId) throw new Error(`T3 returned no timeline thread id for ${epic.id}; inspect the launch outcome`);
+    record = { threadId: launched.threadId };
+    t.data.epics[epic.id] = record;
+    write(t.file, t.data);
+  }
+  j.data.active.timelineId = record.threadId;
+  write(j.file, j.data);
+  const sent = JSON.parse(t3call(o, run, ['thread', 'send', record.threadId, `tick ${item.id} ${item.title} afk`, '--wait', '--json']));
+  // T3 writes a thread link as t3-thread://v1/<id> or t3-thread://v2/<environment>/<id>.
+  const child = /t3-thread:\/\/(?:v1|v2\/[^/\s>]+)\/([^)>\s]+)/.exec(sent.reply || '')?.[1];
+  if (!child) throw new Error(`Timeline ${record.threadId} did not start a phase for ${item.id}; inspect its reply before retrying`);
+  return child;
+}
+// Every turn ends with the skill's result line; a turn that reports one for its item is finished
+// even when it changed nothing (a `waits` on a phase already laid ahead, a `busy` claim).
+function reported(messages, itemId) {
+  const last = (messages?.at(-1)?.text || '').trim().split('\n').at(-1);
+  return new RegExp(`^${itemId.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')} (closed|briefed|reopened|busy|waits): `).test(last) || /^Unit done: /.test(last);
 }
 function progressed(before, after) {
   return after && (after.status !== before.status || JSON.stringify(after.labels || []) !== JSON.stringify(before.labels || []) || after.description !== before.description);
@@ -52,7 +124,7 @@ export function settleActive(o, j, run) {
   const a = j.data.active;
   if (!a) return;
   if (!a.threadId) throw new Error('A prior T3 launch has an uncertain outcome. Inspect t3code/runner.json and T3 before any retry.');
-  const { thread } = JSON.parse(t3call(o, run, ['thread', 'show', a.threadId, '--messages', '1', '--json']));
+  const { thread, messages } = JSON.parse(t3call(o, run, ['thread', 'show', a.threadId, '--messages', '1', '--json']));
   if (['running', 'queued', 'waiting', 'idle'].includes(thread.status)) return { status: 'busy', itemId: a.itemId, ...(a.epicIds ? { epicIds: a.epicIds } : {}), threadId: a.threadId };
   if (thread.status !== 'completed') throw new Error(`T3 turn ${a.threadId} ended as ${thread.status}; inspect it before retrying`);
   const { issues } = readQueue(o, run);
@@ -71,8 +143,8 @@ export function settleActive(o, j, run) {
   if (a.human && after?.status === 'in_progress') return { status: 'busy', itemId: a.itemId, threadId: a.threadId };
   // A human may ask a question before claiming the phase. Release that reservation.
   const awaitingReply = a.human && after?.status === 'open';
-  if ((!awaitingReply && !progressed(a.before, after)) || after?.status === 'in_progress') throw new Error(`T3 turn ${a.threadId} did not finish ${a.itemId}; inspect it before retrying`);
-  settle(j, { itemId: a.itemId, threadId: a.threadId, result: after.status, brief: digest(after.description) });
+  if ((!awaitingReply && !reported(messages, a.itemId) && !progressed(a.before, after)) || after?.status === 'in_progress') throw new Error(`T3 turn ${a.threadId} did not finish ${a.itemId}; inspect it before retrying`);
+  settle(j, { itemId: a.itemId, threadId: a.threadId, ...(a.timelineId ? { timelineId: a.timelineId } : {}), result: after.status, brief: digest(after.description) });
 }
 
 export function tick(o, { dry = false, attendedId } = {}, run = command) {
@@ -97,12 +169,18 @@ export function tick(o, { dry = false, attendedId } = {}, run = command) {
     const prompt = `${homeInstructions(o)} Invoke the Skill tool with skill "umka:run" and args ${JSON.stringify(args)}. Follow it for exactly one phase in this T3 thread. Do not run the queue's tick/inbox command or start nested claude. Use the unit's existing worktree convention when repo work is needed. If the phase needs a human, post its brief here and stop; the human can reply here. On a later human reply, re-read the item, then run ${shellQuote(path.join(o.home, 'bin/umka-t3'))} inbox-resume ${item.id}. Proceed only if reserved; if busy, ask the human to retry later. Follow the same skill with the human present, recording their explicit answer only. Never invent an answer. Do not start another phase automatically. End with the skill's result line.`;
     j.data.active = { itemId: item.id, before: { status: item.status, labels: item.labels, description: item.description }, phase: item.labels?.find(l => l.startsWith('phase:')), launching: true };
     write(j.file, j.data); // Durable before launch; even after a crash a second tick cannot race.
-    const launched = JSON.parse(t3call(o, run, ['thread', 'start', o.project, prompt, '--title', `Umka ${o.instance}: ${item.id} ${item.title}`.slice(0, 200), '--json']));
-    if (!launched.threadId) throw new Error('T3 launch returned no thread id; inspect the launch outcome');
-    j.data.active.threadId = launched.threadId;
+    const epic = !attendedId && timelineJournal(o).data.enabled ? issues.find(i => i.id === item.parent) : null;
+    let threadId;
+    if (epic) threadId = dispatchToTimeline(o, j, item, epic, run);
+    else {
+      const launched = JSON.parse(t3call(o, run, ['thread', 'start', o.project, prompt, '--title', `Umka ${o.instance}: ${item.id} ${item.title}`.slice(0, 200), '--json']));
+      if (!launched.threadId) throw new Error('T3 launch returned no thread id; inspect the launch outcome');
+      threadId = launched.threadId;
+    }
+    j.data.active.threadId = threadId;
     j.data.active.launching = false;
     write(j.file, j.data);
-    return { status: 'started', itemId: item.id, mode: modeOf(item, phases), threadId: launched.threadId };
+    return { status: 'started', itemId: item.id, mode: modeOf(item, phases), threadId, ...(epic ? { timelineId: j.data.active.timelineId } : {}) };
   });
 }
 
@@ -216,11 +294,19 @@ export async function runtimeMain() {
   else if (action === 'inbox-open' && !args.length) result = openInbox(o);
   else if (action === 'inbox-resume' && args.length === 1) result = resumeInbox(o, args[0]);
   else if (action === 'work' && args.length === 1) result = tick(o, { attendedId: args[0] });
-  else if (action === 'answer' && args.length === 3 && args[1] === '--file') result = answer(o, args[0], fs.readFileSync(args[2], 'utf8'));
+  else if (action === 'answer' && args.length === 3 && args[1] === '--file') {
+    const text = fs.readFileSync(args[2], 'utf8');
+    result = answer(o, args[0], text);
+    // A human's answer must outlast a tick that holds the lock while a timeline turn runs.
+    for (let retry = 0; result?.reason === 'locked' && retry < 40; retry++) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      result = answer(o, args[0], text);
+    }
+  } else if (action === 'timeline' && args.length === 1) result = timeline(o, args[0]);
   else if (['schedule-install', 'enable', 'disable', 'schedule-status', 'schedule-run', 'schedule-uninstall'].includes(action)) {
     const { schedule } = await import('./umka-t3-schedule.mjs');
     result = await schedule(o, action, args);
-  } else throw new Error('usage: umka-t3 tick [--dry-run] | intake [--dry-run] | inbox | inbox-open | work ID | answer ID --file PATH | schedule-install [--every-ms N] | enable | disable | schedule-status | schedule-run | schedule-uninstall | inbox-resume ID');
+  } else throw new Error('usage: umka-t3 tick [--dry-run] | intake [--dry-run] | inbox | inbox-open | work ID | answer ID --file PATH | timeline enable|disable|status | schedule-install [--every-ms N] | enable | disable | schedule-status | schedule-run | schedule-uninstall | inbox-resume ID');
   // Both launchd jobs can fire together. Retry only short-lived lock contention.
   for (let retry = 0; quiet && result?.reason === 'locked' && retry < 10; retry++) {
     await new Promise(resolve => setTimeout(resolve, 200));
