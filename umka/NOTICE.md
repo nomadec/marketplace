@@ -11,6 +11,15 @@ Skills under `skills/vendor/` are forks of third-party skills, adapted to run he
 - License: MIT
 - Copyright (c) 2026 Matt Pocock
 
+## mattpocock-diagnosing-bugs
+
+- Upstream: `mattpocock-skills:diagnosing-bugs` (`skills/engineering/diagnosing-bugs`)
+- Repo: https://github.com/mattpocock/skills
+- Version: 1.3.2
+- Commit: a496f5513d4a4cf889bc48e189e579f4b0bdf6aa
+- License: MIT
+- Copyright (c) 2026 Matt Pocock
+
 ## mattpocock-to-spec
 
 - Upstream: `mattpocock-skills:to-spec` (`skills/engineering/to-spec`)

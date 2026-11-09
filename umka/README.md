@@ -71,7 +71,7 @@ umka/
 ├── skills/
 │   ├── run/                  the loop entry
 │   ├── findings/
-│   ├── explore/ intake/ answer/ qa-plan/ diagnose/ addressing-pr-comments/
+│   ├── explore/ intake/ answer/ qa-plan/ addressing-pr-comments/
 │   └── vendor/mattpocock-*/  forks of mattpocock-skills
 ├── phases/                   one file per phase, registry, tests and fixtures
 ├── lib/                      phases.mjs (the loader), pick.mjs (the pick)
