@@ -2,7 +2,7 @@
 phase: grill
 mode: hitl
 skill: umka:mattpocock-grilling
-from: [source, sort, explore, prototype, reproduce]
+from: [source, sort, explore, prototype, diagnose]
 to:
   - phase: slice
 artifact: the spec issue meets this phase's Done when criteria, the epic's spec: note names it, and GLOSSARY or ADR commits are on the branch

@@ -215,7 +215,7 @@ test('bug labels reach the imported brief and incomplete bug pre-work blocks com
   epic.labels.push('topic:other');
   f.state.threadStatus = 'completed';
   assert.throws(() => f.call(), /did not finish classifying/);
-  f.state.issues.push({ id: 'u-1.1', parent: epic.id, status: 'open', labels: ['phase:reproduce'] });
+  f.state.issues.push({ id: 'u-1.1', parent: epic.id, status: 'open', labels: ['phase:diagnose'] });
   assert.equal(f.call().status, 'empty');
 });
 

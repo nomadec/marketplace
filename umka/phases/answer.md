@@ -2,7 +2,7 @@
 phase: answer
 mode: afk
 skill: umka:answer
-from: [explore, reproduce]
+from: [explore, diagnose]
 to: []
 artifact: the reply posted to the channel, and as a comment on the source ticket when there is one
 budget: 30k

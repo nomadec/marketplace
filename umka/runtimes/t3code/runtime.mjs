@@ -61,8 +61,8 @@ export function settleActive(o, j, run) {
       const epic = issues.find(i => i.id === id);
       const classification = /^class: (bug|proposal|spec|ticket|question|idea)$/m.exec(epic?.notes || '');
       const topic = epic?.labels?.some(l => l.startsWith('topic:'));
-      const reproduced = classification?.[1] !== 'bug' || issues.some(i => i.parent === id && i.labels?.includes('phase:reproduce'));
-      if (!classification || !topic || !reproduced) throw new Error(`T3 intake ${a.threadId} did not finish classifying ${id}; inspect it before retrying`);
+      const diagnosed = classification?.[1] !== 'bug' || issues.some(i => i.parent === id && i.labels?.includes('phase:diagnose'));
+      if (!classification || !topic || !diagnosed) throw new Error(`T3 intake ${a.threadId} did not finish classifying ${id}; inspect it before retrying`);
     }
     settle(j, { kind: 'intake', intakeBatchId: a.intakeBatchId, epicIds: a.epicIds, threadId: a.threadId, result: 'classified' });
     return;

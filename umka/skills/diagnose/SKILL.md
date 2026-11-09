@@ -1,6 +1,6 @@
 ---
-name: reproduce
-description: "Reproduce a reported bug until a test goes red on it and the cause is named: build a tight feedback loop, reproduce, minimise, hypothesise, instrument, commit the red test. No fix. Headless: nothing is asked of a user mid-run. Used by the umka:run phase reproduce; called by name, not for auto-triggering."
+name: diagnose
+description: "Diagnose and fix a reported bug in one run: build a tight feedback loop, reproduce, minimise, hypothesise, instrument, commit the red test, apply the fix at the cause, clean up, until the full suite is green and the commits are pushed. Headless: nothing is asked of a user mid-run. Used by the umka:run phase diagnose; called by name, not for auto-triggering."
 origin:
   upstream: mattpocock-skills:diagnosing-bugs
   repo: github.com/mattpocock/skills
@@ -8,14 +8,14 @@ origin:
   commit: a496f5513d4a4cf889bc48e189e579f4b0bdf6aa
   license: MIT
   adapted: true
-  derived: the first half of the upstream skill, Redact through Phase 4 and the red test of Phase 5, with no fix and no questions to a user
+  derived: the whole upstream skill, with the red test committed before the fix, four findings that end the run early, and no questions to a user
 ---
 
-# Reproduce
+# Diagnose
 
-The input is a bug report and its source ticket, in a checkout on the unit's branch. The output is the cause, the reproduction (a red test committed on the branch) and the fix size, or one of the three findings that end the run early. Nothing is fixed here. Nobody is asked anything mid-run: a point where a human's word would help is a line in the return, and the run goes on.
+The input is a bug report and its source ticket, in a checkout on the unit's branch. The output is the cause, the reproduction (a red test committed on the branch) and the commits that make it green with the full suite green, pushed. Or one of the four findings that end the run early. Nobody is asked anything mid-run: a point where a human's word would help is a line in the return, and the run goes on.
 
-Read `GLOSSARY.md` when it exists for the modules the report names, and the ADRs in the area you touch.
+Read `GLOSSARY.md` when it exists for the modules the report names, and the ADRs in the area you touch. A fix that contradicts an ADR is a finding, not a fix.
 
 ## Redact
 
@@ -58,7 +58,7 @@ Run the loop. Watch it go red. Confirm:
 
 - The loop produces the failure the reporter described, not a nearby one. Wrong bug, wrong fix.
 - The failure repeats across runs, or at a rate high enough to work against.
-- The exact symptom is captured (error text, wrong output, timing), so the fix turn can prove it is gone.
+- The exact symptom is captured (error text, wrong output, timing), so step 7 can prove it is gone.
 
 Then shrink the repro to the smallest scenario that still goes red. Cut inputs, callers, config, data and steps one at a time, re-running after each cut, and keep only what the failure needs. Done when removing any remaining element makes the loop go green. The minimal repro narrows the hypotheses and becomes the regression test.
 
@@ -78,25 +78,53 @@ Done when one hypothesis held and the others fell: the cause is one sentence tha
 
 Design question: the cause is a decision nobody took, two behaviours are each defensible and the spec does not choose. Stop with the `Design question` finding: the two behaviours and the evidence for each.
 
-## 5. Lock the cause in a red test
-
-Write the regression test at a correct seam: one where the test exercises the real bug pattern as it occurs at the call site. A seam that is too shallow (a single-caller test when the bug needs several callers, a unit test that cannot replay the chain) gives false confidence. No correct seam is itself the finding: say so in the return, and commit the loop from step 1 under a marked path (`scripts/debug/<ticket>/`) so the fix turn can run it.
-
-With a seam: turn the minimised repro into a failing test there. Watch it fail. A red forced by mutating code or a fixture is proved with a `diff` against a pristine copy before it is trusted. Remove every `[DEBUG-...]` line (`grep` the prefix) and every throwaway harness that is not the committed loop. Commit the test alone, message `test: reproduce <ticket>: <symptom>`, on the unit's branch. Leave the test red.
-
-## Fix size
+## 5. Size the fix
 
 - `small`: one change in one place; the red test covers it.
 - `medium`: several files, a data change or a migration; the red test covers the behaviour, the suite covers the rest.
-- `large`: the fix changes a design or an interface other code depends on; a grill decides it before any fix.
+- `large`: the fix changes a design or an interface other code depends on. Stop with the `Large fix` finding: the cause, the interface it changes, and who depends on it. A grill decides it before any fix.
+
+## 6. Lock the cause in a red test
+
+Write the regression test at a correct seam: one where the test exercises the real bug pattern as it occurs at the call site. A seam that is too shallow (a single-caller test when the bug needs several callers, a unit test that cannot replay the chain) gives false confidence. No correct seam is itself a finding for the return: commit the loop from step 1 under a marked path (`scripts/debug/<ticket>/`) and use it as the red signal for step 7.
+
+With a seam: turn the minimised repro into a failing test there. Watch it fail. A red forced by mutating code or a fixture is proved with a `diff` against a pristine copy before it is trusted. Commit the test alone, message `test: reproduce <ticket>: <symptom>`, on the unit's branch.
+
+## 7. Apply the fix
+
+The fix removes the cause, not the symptom. A change that makes the test green at a different place than the cause (a guard at the call site for a bug in the callee, a retry around a race) is not the fix. The smallest change that removes the cause. Never change the test to make it pass; a test that asserts the wrong thing is a finding for the return, not an edit. Match the repo's conventions. When the fix opens a correct seam that step 6 lacked, write the regression test there now, red before the fix, green after.
+
+Watch the red test go green. Re-run the original, un-minimised reproduction from the ticket's report: the symptom is gone there too, not only in the minimal case.
+
+## 8. Suite and checks
+
+Run the project's checks: typecheck, the affected test files, then the full suite once. Every check green. A test unrelated to the fix goes red: find whether the fix broke it (then the fix is wrong) or it was red on the default branch already (then say so in the return; do not touch it).
+
+## 9. Cleanup
+
+Before the commit, each line holds:
+
+- The original repro does not reproduce (step 7 re-run).
+- The regression test passes, or the absence of a seam is in the return.
+- No `[DEBUG-...]` instrumentation remains: `grep` the prefix across the tree.
+- Every throwaway harness is deleted; `scripts/debug/<ticket>/` goes with the fix when the regression test now covers it.
+- No change outside the fix's scope.
+
+## 10. Commit and push
+
+One commit for the fix, or one per logical part of it. The message says what was wrong and why: the cause sentence, the hypothesis that held, so the next reader learns it. The red test's commit stays as it is; the fix commit follows it. Push the branch.
 
 ## Return
 
 ```
 Cause: <one sentence: the code and the condition; the hypothesis that held>
 Reproduction: <test path>, run with `<command>`, red at <commit sha>
-Fix size: small | medium | large. <reason, one sentence>
+Fix size: small | medium. <reason, one sentence>
+Commits: <sha> <subject>, one per line
+Test: <test path> green; suite green (<n> tests); <checks run>
 Hypotheses: <the ranked list, one line each, with held or fell>
 ```
 
-Or one of the early findings, each with its evidence under it: `No loop: <what was tried; what a human must supply>`, `Not a bug: <the pointer that asks for this behaviour>`, `Design question: <the two behaviours>`. Nothing else.
+A line `Seam: none; <why>` when no regression test could be placed, and a line `Unrelated red: <test>, red on <default branch> at <sha>` when one was found.
+
+Or one of the four findings, each with its evidence under it: `No loop: <what was tried; what a human must supply>`, `Not a bug: <the pointer that asks for this behaviour>`, `Design question: <the two behaviours>`, `Large fix: <the cause; the interface it changes; who depends on it>`. A fix that contradicts an ADR is `Design question` with the ADR as one of the two behaviours. Nothing else.

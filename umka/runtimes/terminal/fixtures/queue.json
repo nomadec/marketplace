@@ -18,13 +18,13 @@
  },
  {
   "id": "app-05y.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "closed",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:media-generation"
   ],
   "created_at": "2026-10-20T05:22:15Z",
@@ -50,7 +50,7 @@
   "labels": [
    "checkpoint",
    "loop",
-   "phase:decide-fix",
+   "phase:decide-blocking",
    "topic:media-generation"
   ],
   "created_at": "2026-10-20T06:12:46Z",
@@ -72,13 +72,13 @@
  },
  {
   "id": "app-05y.3",
-  "title": "fix",
+  "title": "address",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:fix",
+   "phase:address",
    "topic:media-generation"
   ],
   "created_at": "2026-10-20T06:12:55Z",
@@ -270,13 +270,13 @@
  },
  {
   "id": "app-79w.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "closed",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:media-generation"
   ],
   "created_at": "2026-10-20T05:22:12Z",
@@ -303,7 +303,7 @@
    "applied",
    "checkpoint",
    "loop",
-   "phase:decide-fix",
+   "phase:decide-blocking",
    "topic:media-generation"
   ],
   "created_at": "2026-10-20T06:07:20Z",
@@ -327,13 +327,13 @@
  },
  {
   "id": "app-79w.3",
-  "title": "fix",
+  "title": "address",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:fix",
+   "phase:address",
    "topic:media-generation"
   ],
   "created_at": "2026-10-20T06:07:21Z",
@@ -423,13 +423,13 @@
  },
  {
   "id": "app-8rc.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:tenancy"
   ],
   "created_at": "2026-10-20T05:22:54Z",
@@ -463,13 +463,13 @@
  },
  {
   "id": "app-995.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:frontend"
   ],
   "created_at": "2026-10-20T05:22:37Z",
@@ -503,13 +503,13 @@
  },
  {
   "id": "app-9v3.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:training-events"
   ],
   "created_at": "2026-10-20T05:22:47Z",
@@ -560,13 +560,13 @@
  },
  {
   "id": "app-bvd.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:scorm"
   ],
   "created_at": "2026-10-20T05:22:34Z",
@@ -651,13 +651,13 @@
  },
  {
   "id": "app-d1o.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:training-events"
   ],
   "created_at": "2026-10-20T05:22:50Z",
@@ -691,13 +691,13 @@
  },
  {
   "id": "app-eam.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:uploads"
   ],
   "created_at": "2026-10-20T05:22:23Z",
@@ -2181,13 +2181,13 @@
  },
  {
   "id": "app-oxn.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:frontend"
   ],
   "created_at": "2026-10-20T05:23:32Z",
@@ -2698,13 +2698,13 @@
  },
  {
   "id": "app-t11.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "closed",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:tests"
   ],
   "created_at": "2026-10-20T05:22:08Z",
@@ -2731,7 +2731,7 @@
    "applied",
    "checkpoint",
    "loop",
-   "phase:decide-fix",
+   "phase:decide-blocking",
    "topic:tests"
   ],
   "created_at": "2026-10-20T05:41:25Z",
@@ -2755,13 +2755,13 @@
  },
  {
   "id": "app-t11.3",
-  "title": "fix",
+  "title": "address",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:fix",
+   "phase:address",
    "topic:tests"
   ],
   "created_at": "2026-10-20T05:41:27Z",
@@ -2834,13 +2834,13 @@
  },
  {
   "id": "app-w01.1",
-  "title": "reproduce",
+  "title": "diagnose",
   "status": "open",
   "priority": 2,
   "issue_type": "task",
   "labels": [
    "loop",
-   "phase:reproduce",
+   "phase:diagnose",
    "topic:feature-settings"
   ],
   "created_at": "2026-10-20T05:22:43Z",

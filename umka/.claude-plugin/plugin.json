@@ -17,12 +17,11 @@
   "skills": [
     "./skills/addressing-pr-comments",
     "./skills/answer",
+    "./skills/diagnose",
     "./skills/explore",
     "./skills/findings",
-    "./skills/fix",
     "./skills/intake",
     "./skills/qa-plan",
-    "./skills/reproduce",
     "./skills/run",
     "./skills/vendor/mattpocock-code-review",
     "./skills/vendor/mattpocock-codebase-design",

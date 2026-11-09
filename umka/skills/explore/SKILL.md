@@ -1,6 +1,6 @@
 ---
 name: explore
-description: "Pick the one move that gets a question its missing piece (research, prototype, reproduce, questionnaire, grill, answer or spec) and give the reason in one line. Used by the umka:run phase explore; called by name, not for auto-triggering."
+description: "Pick the one move that gets a question its missing piece (research, prototype, diagnose, questionnaire, grill, answer or spec) and give the reason in one line. Used by the umka:run phase explore; called by name, not for auto-triggering."
 ---
 
 # Explore
@@ -19,7 +19,7 @@ One move, by what is missing:
 |---|---|
 | A fact the docs, the source, or primary sources hold | `research` |
 | A feel for whether a state model or UI works | `prototype` |
-| The cause of a reported failure | `reproduce` |
+| The cause of a reported failure | `diagnose` |
 | Knowledge a colleague or client holds | `questionnaire` |
 | A design decision only the human can settle | `grill` |
 | Nothing: the reporter needs a reply, no code | `answer` |

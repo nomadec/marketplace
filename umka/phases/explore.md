@@ -9,8 +9,8 @@ to:
     when: the move is research
   - phase: prototype
     when: the move is prototype
-  - phase: reproduce
-    when: the move is reproduce
+  - phase: diagnose
+    when: the move is diagnose
   - phase: questionnaire
     when: the move is questionnaire
   - phase: answer

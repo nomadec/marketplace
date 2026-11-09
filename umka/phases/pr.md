@@ -2,7 +2,7 @@
 phase: pr
 mode: afk
 skill: umka:mattpocock-pr
-from: [slice, implement, fix]
+from: [slice, implement, diagnose]
 to:
   - phase: review
 artifact: a PR for the branch exists and the epic's pr: note names it
