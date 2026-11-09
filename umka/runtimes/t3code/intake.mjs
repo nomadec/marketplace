@@ -12,7 +12,7 @@ const read = (file, fallback) => fs.existsSync(file) ? JSON.parse(fs.readFileSyn
 export function poll(source, cursor, run = command) {
   if (source.kind === 'github') {
     const since = cursor?.created ? ` created:>=${cursor.created}` : '';
-    return JSON.parse(run('gh', ['issue', 'list', '--repo', source.repo, '--state', 'all', '--limit', '200',
+    return JSON.parse(run('gh', ['issue', 'list', '--repo', source.repo, '--state', 'open', '--limit', '200',
       '--search', `sort:created-asc${since}`, '--json', 'number,title,body,author,labels,url,createdAt']))
       .filter(i => String(i.number) !== String(cursor?.id))
       .map(i => ({ id: String(i.number), title: i.title, text: i.body || '', who: i.author?.login || 'unknown',

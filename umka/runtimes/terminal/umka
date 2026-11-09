@@ -124,12 +124,12 @@ async function inbox() {
   }
 }
 
-// The poll: GitHub Issues and JSON Lines files today. Each source has one cursor, the newest
+// The poll: open GitHub Issues and JSON Lines files today. Each source has one cursor, the newest
 // item taken, by its creation time. Jira waits for a client.
 function poll(source, cursor) {
   if (source.kind === "github") {
     const since = cursor?.created ? ` created:>${cursor.created}` : "";
-    const out = execFileSync("gh", ["issue", "list", "--repo", source.repo, "--state", "all", "--limit", "200",
+    const out = execFileSync("gh", ["issue", "list", "--repo", source.repo, "--state", "open", "--limit", "200",
       "--search", `sort:created-asc${since}`, "--json", "number,title,body,author,labels,url,createdAt"], { encoding: "utf8" });
     return JSON.parse(out)
       .filter((i) => String(i.number) !== String(cursor?.id))

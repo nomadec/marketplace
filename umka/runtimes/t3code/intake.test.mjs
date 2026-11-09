@@ -169,7 +169,7 @@ test('a pending batch left after a successful launch is cleared using completed 
   assert.equal(JSON.parse(fs.readFileSync(path.join(f.o.home, 't3code/intake.json'))).pending, null);
 });
 
-test('GitHub polling uses the cursor boundary and preserves source labels and author', () => {
+test('GitHub polling takes open issues, uses the cursor boundary and preserves source labels and author', () => {
   let args;
   const items = poll({ kind: 'github', repo: 'example/project' }, { id: '1', created: '2026-10-26T00:00:00Z' }, (exe, a) => {
     assert.equal(exe, 'gh'); args = a;
@@ -178,6 +178,7 @@ test('GitHub polling uses the cursor boundary and preserves source labels and au
       { number: 2, title: 'Bug', body: 'Broken', labels: [{ name: 'bug' }], author: { login: 'reporter' }, url: 'https://github.com/example/project/issues/2', createdAt: '2026-10-26T00:00:00Z' },
     ]);
   });
+  assert.equal(args[args.indexOf('--state') + 1], 'open');
   assert.match(args[args.indexOf('--search') + 1], /created:>=2026-10-26T00:00:00Z/);
   assert.deepEqual(items[0].labels, ['bug']);
   assert.equal(items[0].who, 'reporter');
