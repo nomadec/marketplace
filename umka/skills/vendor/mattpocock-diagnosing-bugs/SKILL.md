@@ -1,6 +1,6 @@
 ---
 name: mattpocock-diagnosing-bugs
-description: "Diagnosis loop for hard bugs and performance regressions: build a feedback loop, reproduce, minimise, hypothesise, instrument, fix with a regression test, clean up."
+description: "Diagnosis loop for hard bugs and performance regressions."
 origin:
   skill: mattpocock-skills:diagnosing-bugs
   path: skills/engineering/diagnosing-bugs
