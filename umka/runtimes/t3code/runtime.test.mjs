@@ -214,3 +214,11 @@ test('a human clarification without claiming work releases the worker slot', t =
   f.state.issues.push({ ...f.state.issues[1], id: 'u-1.2', labels: ['phase:answer'] });
   assert.equal(tick(f.o, {}, f.run).status, 'started');
 });
+
+test('a human question in a thread that work opened releases the worker slot', t => {
+  const f = fixture(t);
+  f.state.issues[1].labels = ['phase:grill', 'briefed'];
+  assert.equal(tick(f.o, { attendedId: 'u-1.1' }, f.run).status, 'started');
+  f.state.threadStatus = 'completed';
+  assert.equal(tick(f.o, {}, f.run).status, 'waiting');
+});
